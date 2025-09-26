@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\User;
 use Livewire\Volt\Volt;
 use App\Livewire\Templates;
 use Laravel\Fortify\Features;
@@ -15,9 +16,14 @@ Route::get('/', function () {
     }
 })->name('home');
 
-Route::view('dashboard', 'dashboard')
-    ->middleware(['auth', 'verified'])
-    ->name('dashboard');
+Route::get('dashboard', function () {
+    $userCount = User::where('role', 'user')->count();
+    // $projectCount = Project::count();
+
+    return view('dashboard', compact('userCount'));
+})
+->middleware(['auth', 'verified'])
+->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');

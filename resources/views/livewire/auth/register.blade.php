@@ -13,6 +13,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
     public string $email = '';
     public string $password = '';
     public string $password_confirmation = '';
+    public string $student_number = '';
+
 
     /**
      * Handle an incoming registration request.
@@ -23,6 +25,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
             'name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'lowercase', 'email', 'max:255', 'unique:' . User::class],
             'password' => ['required', 'string', 'confirmed', Rules\Password::defaults()],
+            'student_number' => ['required', 'string', 'max:20', 'unique:' . User::class],
         ]);
 
         $validated['password'] = Hash::make($validated['password']);
@@ -51,6 +54,16 @@ new #[Layout('components.layouts.auth')] class extends Component {
             autofocus
             autocomplete="name"
             :placeholder="__('Full name')"
+        />
+
+        <flux:input
+            wire:model="student_number"
+            :label="__('Student Number')"
+            type="text"
+            required
+            autofocus
+            autocomplete="student_number"
+            placeholder="12345678"
         />
 
         <!-- Email Address -->
