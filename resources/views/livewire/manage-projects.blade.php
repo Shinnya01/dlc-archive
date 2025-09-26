@@ -3,7 +3,9 @@
     <div class="flex items-center justify-between">
         <h1 class="text-4xl font-bold text-red-900">Manage Research Projects</h1>
         <div class="flex justify-end w-lg">
+            <flux:modal.trigger name="create-project">
             <flux:button icon="plus" class="cursor-pointer">Create Project</flux:button>
+            </flux:modal.trigger>
         </div>
     </div>
     <div class="mt-6 p-4 bg-white rounded-xl">
@@ -83,4 +85,40 @@
             </table>
         </div>
     </div>
+
+    <!-- create project -->
+    <flux:modal name="create-project" class="md:w-96">
+    <div class="space-y-6">
+        <div>
+            <flux:heading size="lg">Create new research project</flux:heading>
+            <flux:text class="mt-2">Create new research project that user can download</flux:text>
+        </div>
+        <flux:input label="Title" placeholder="Title" />
+        <flux:input label="Author" placeholder="Author" />
+        <flux:input label="Year" placeholder="Year" />
+        <flux:input label="File" placeholder="File" />
+        <div class="flex">
+            <flux:spacer />
+            <flux:button type="submit" variant="primary">Create</flux:button>
+        </div>
+    </div>
+    </flux:modal>
+
+   <!-- edit project -->
+    <flux:modal name="edit-project" class="md:w-96">
+    <div class="space-y-6">
+        <div>
+            <flux:heading size="lg">Update research project</flux:heading>
+            <flux:text class="mt-2">Update research project that user can download</flux:text>
+        </div>
+        <flux:input label="Title" placeholder="Title" />
+        <flux:input label="Author" placeholder="Author" />
+        <flux:input label="Year" placeholder="Year" />
+        <flux:input label="File" placeholder="File" />
+        <div class="flex">
+            <flux:spacer />
+            <flux:button type="submit" variant="primary">Create</flux:button>
+        </div>
+    </div>
+    </flux:modal>
 </div>
