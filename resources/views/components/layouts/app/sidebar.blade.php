@@ -68,6 +68,9 @@
 
                     <flux:navlist.item  class="{{ request()->routeIs('inbox') ? '!text-black' : '!text-white' }}" icon="user-plus" wire:navigate>{{ __('Add Admin Account') }}</flux:navlist.item>
 
+                    <flux:navlist.item  class="{{ request()->routeIs('inbox') ? '!text-black' : '!text-white' }}" icon="user-plus" wire:navigate>{{ __('Inbox') }}</flux:navlist.item>
+
+
                 </flux:navlist.group>
             </flux:navlist>
 
