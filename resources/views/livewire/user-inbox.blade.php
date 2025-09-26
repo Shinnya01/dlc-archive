@@ -1,7 +1,7 @@
 <div>
     {{-- To attain knowledge, add things every day; To attain wisdom, subtract things every day. --}}
     <div class="flex items-center justify-between">
-        <h1 class="text-4xl font-bold text-red-900">Pending ACM Requests</h1>
+        <h1 class="text-4xl font-bold text-red-900">My ACM Requests</h1>
         <div class="flex justify-end w-lg">
         </div>
     </div>
@@ -44,8 +44,8 @@
                             </td>
      
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm ">
-                                <flux:button class="mr-2" icon="check" size="sm">Approve</flux:button>
-                                <flux:button variant="danger" icon="x-mark" size="sm" >Decline</flux:button>
+                                <flux:button class="mr-2" icon="folder-arrow-down" size="sm">Download</flux:button>
+                                <flux:button variant="danger" icon="x-mark" size="sm" >Delete</flux:button>
                             </td>
                         </tr>
                 </tbody>
@@ -55,3 +55,4 @@
 
 
 </div>
+

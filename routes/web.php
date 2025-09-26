@@ -4,6 +4,7 @@ use App\Models\User;
 use App\Livewire\Inbox;
 use Livewire\Volt\Volt;
 use App\Livewire\Templates;
+use App\Livewire\UserInbox;
 use App\Livewire\ManageUsers;
 use Laravel\Fortify\Features;
 use App\Livewire\AdminAccounts;
@@ -14,7 +15,13 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     if(auth()->check()) {
-        return redirect()->route('dashboard');
+
+        if(auth()->user()->isUser()){
+            return redirect()->route('templates');
+        }else{
+            return redirect()->route('dashboard');
+        }
+
     }else{
         return redirect()->route('login');
     }
@@ -27,7 +34,7 @@ Route::get('dashboard', function () {
 
     return view('dashboard', compact('userCount', 'name'));
 })
-->middleware(['auth', 'verified'])
+->middleware(['auth', 'verified', 'role:admin'])
 ->name('dashboard');
 
 Route::middleware(['auth'])->group(function () {
@@ -48,11 +55,17 @@ Route::middleware(['auth'])->group(function () {
         )
         ->name('two-factor.show');
 
-    Route::get('templates', Templates::class)->name('templates');
-    Route::get('manage-users', ManageUsers::class)->name('manage-users');
-    Route::get('manage-projects', ManageProjects::class)->name('manage-projects');
-    Route::get('admin-accounts', AdminAccounts::class)->name('admin-accounts');
-    Route::get('inbox', Inbox::class)->name('inbox');
+    Route::middleware(['auth','role:admin'])->group(function () {
+        Route::get('manage-users', ManageUsers::class)->name('manage-users');
+        Route::get('manage-projects', ManageProjects::class)->name('manage-projects');
+        Route::get('admin-accounts', AdminAccounts::class)->name('admin-accounts');
+        Route::get('inbox', Inbox::class)->name('inbox');
+    });
+
+    Route::middleware(['auth','role:user'])->group(function () {
+        Route::get('templates', Templates::class)->name('templates');
+        Route::get('user-inbox', UserInbox::class)->name('user-inbox');
+    });
 });
 
 
@@ -68,7 +81,7 @@ Route::get('/test-github-models', function () {
         ->post('https://models.github.ai/inference/chat/completions', [
             'model' => 'openai/gpt-4.1-nano', 
             'messages' => [
-                ['role' => 'user', 'content' => 'Hello, can you generate a short greeting?'],
+                ['role' => 'user', 'content' => 'Hello, do you know jhonmar?'],
             ],
         ]);
 
