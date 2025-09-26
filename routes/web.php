@@ -1,10 +1,14 @@
 <?php
 
 use App\Models\User;
+use App\Livewire\Inbox;
 use Livewire\Volt\Volt;
 use App\Livewire\Templates;
+use App\Livewire\ManageUsers;
 use Laravel\Fortify\Features;
+use App\Livewire\AdminAccounts;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Livewire\ManageProjects;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
@@ -18,9 +22,10 @@ Route::get('/', function () {
 
 Route::get('dashboard', function () {
     $userCount = User::where('role', 'user')->count();
+    $name = auth()->user()->name;
     // $projectCount = Project::count();
 
-    return view('dashboard', compact('userCount'));
+    return view('dashboard', compact('userCount', 'name'));
 })
 ->middleware(['auth', 'verified'])
 ->name('dashboard');
@@ -44,7 +49,10 @@ Route::middleware(['auth'])->group(function () {
         ->name('two-factor.show');
 
     Route::get('templates', Templates::class)->name('templates');
-        
+    Route::get('manage-users', ManageUsers::class)->name('manage-users');
+    Route::get('manage-projects', ManageProjects::class)->name('manage-projects');
+    Route::get('admin-accounts', AdminAccounts::class)->name('admin-accounts');
+    Route::get('inbox', Inbox::class)->name('inbox');
 });
 
 
