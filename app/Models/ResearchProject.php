@@ -6,10 +6,16 @@ use Illuminate\Database\Eloquent\Model;
 
 class ResearchProject extends Model
 {
-    public $fillable = [
+    protected $fillable = [
         'title',
         'author',
         'year',
         'file',
     ];
+
+    protected $casts = [
+    'author'   => 'array',
+    'keywords' => 'array',
+    ];
+
 }

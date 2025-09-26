@@ -4,6 +4,7 @@ use App\Models\User;
 use App\Livewire\Inbox;
 use Livewire\Volt\Volt;
 use App\Livewire\Templates;
+use App\Livewire\TestToast;
 use App\Livewire\UserInbox;
 use App\Livewire\ManageUsers;
 use Laravel\Fortify\Features;
@@ -68,6 +69,7 @@ Route::middleware(['auth'])->group(function () {
     });
 });
 
+Route::get('test-toast', TestToast::class)->name('test-toast');
 
 Route::get('/test-github-models', function () {
     $token = config('services.github_models.token');

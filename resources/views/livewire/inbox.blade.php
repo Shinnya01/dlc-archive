@@ -11,6 +11,9 @@
                 <thead class="bg-amber-100">
                     <tr class="">
                         <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                            #
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
                             Requester
                         </th>
                         <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
@@ -28,27 +31,38 @@
                         </th>
                     </tr>
                 </thead>
+               
                 <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach ($requests as $request)
                     <tr>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                Jhon Doe
+                                {{ $loop->iteration }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                Capstone ni jhonmar
+                                {{ $request->user->name }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                Ipapasa kay rommel
+                                {{ $request->researchProject->title }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                Pending
+                                {{ $request->purpose }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                {{ $request->status }}
                             </td>
      
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm ">
-                                <flux:button class="mr-2" icon="check" size="sm">Approve</flux:button>
-                                <flux:button variant="danger" icon="x-mark" size="sm" >Decline</flux:button>
+                                @if($request->status !== 'approved')
+                                    <flux:button class="mr-2" icon="check" size="sm" wire:click="approveRequest({{ $request->id }})">Approve</flux:button>
+                                    <flux:button variant="danger" icon="x-mark" size="sm" wire:click="rejectRequest({{ $request->id }})">Decline</flux:button>
+                                @else
+                                    <flux:button variant="danger" icon="x-mark" size="sm" wire:click="rejectRequest({{ $request->id }})">Delete</flux:button>
+                                @endif
                             </td>
                         </tr>
+                        @endforeach
                 </tbody>
+                
             </table>
         </div>
     </div>

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "442842e30b907c96e102900934cc78a7",
+    "content-hash": "cf16203c07bdd12cc614694e6cff82eb",
     "packages": [
         {
             "name": "bacon/bacon-qr-code",
@@ -2626,6 +2626,80 @@
             "time": "2025-08-06T15:40:50+00:00"
         },
         {
+            "name": "masmerise/livewire-toaster",
+            "version": "2.8.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/masmerise/livewire-toaster.git",
+                "reference": "7e77389fc89205bb3a8759fab66116d86a3b3a48"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/masmerise/livewire-toaster/zipball/7e77389fc89205bb3a8759fab66116d86a3b3a48",
+                "reference": "7e77389fc89205bb3a8759fab66116d86a3b3a48",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/contracts": "^11.0 || ^12.0",
+                "illuminate/http": "^11.0 || ^12.0",
+                "illuminate/routing": "^11.0 || ^12.0",
+                "illuminate/support": "^11.0 || ^12.0",
+                "illuminate/view": "^11.0 || ^12.0",
+                "livewire/livewire": "^3.0",
+                "php": "~8.2 || ~8.3 || ~8.4"
+            },
+            "conflict": {
+                "stevebauman/unfinalize": "*"
+            },
+            "require-dev": {
+                "larastan/larastan": "^2.0 || ^3.1",
+                "laravel/pint": "^1.0",
+                "orchestra/testbench": "^9.0 || ^10.0",
+                "phpunit/phpunit": "^10.0 || ^11.5.3"
+            },
+            "type": "library",
+            "extra": {
+                "laravel": {
+                    "aliases": {
+                        "Toaster": "Masmerise\\Toaster\\Toaster"
+                    },
+                    "providers": [
+                        "Masmerise\\Toaster\\ToasterServiceProvider"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Masmerise\\Toaster\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Muhammed Sari",
+                    "email": "support@muhammedsari.me",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Beautiful toast notifications for Laravel / Livewire.",
+            "homepage": "https://github.com/masmerise/livewire-toaster",
+            "keywords": [
+                "alert",
+                "laravel",
+                "livewire",
+                "toast",
+                "toaster"
+            ],
+            "support": {
+                "issues": "https://github.com/masmerise/livewire-toaster/issues",
+                "source": "https://github.com/masmerise/livewire-toaster/tree/2.8.0"
+            },
+            "time": "2025-05-02T09:02:22+00:00"
+        },
+        {
             "name": "masterminds/html5",
             "version": "2.10.0",
             "source": {
@@ -4216,6 +4290,115 @@
                 "source": "https://github.com/MyIntervals/PHP-CSS-Parser/tree/v8.9.0"
             },
             "time": "2025-07-11T13:20:48+00:00"
+        },
+        {
+            "name": "smalot/pdfparser",
+            "version": "v2.12.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/smalot/pdfparser.git",
+                "reference": "98d31ba34ef5b5a98897ef4b6c3925d502ea53b1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/smalot/pdfparser/zipball/98d31ba34ef5b5a98897ef4b6c3925d502ea53b1",
+                "reference": "98d31ba34ef5b5a98897ef4b6c3925d502ea53b1",
+                "shasum": ""
+            },
+            "require": {
+                "ext-iconv": "*",
+                "ext-zlib": "*",
+                "php": ">=7.1",
+                "symfony/polyfill-mbstring": "^1.18"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Smalot\\PdfParser\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "LGPL-3.0"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastien MALOT",
+                    "email": "sebastien@malot.fr"
+                }
+            ],
+            "description": "Pdf parser library. Can read and extract information from pdf file.",
+            "homepage": "https://www.pdfparser.org",
+            "keywords": [
+                "extract",
+                "parse",
+                "parser",
+                "pdf",
+                "text"
+            ],
+            "support": {
+                "issues": "https://github.com/smalot/pdfparser/issues",
+                "source": "https://github.com/smalot/pdfparser/tree/v2.12.1"
+            },
+            "time": "2025-07-31T06:19:56+00:00"
+        },
+        {
+            "name": "spatie/pdf-to-text",
+            "version": "1.54.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spatie/pdf-to-text.git",
+                "reference": "ad2a792c7e1e68f1bc9b038dc73cdcf760595fbb"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spatie/pdf-to-text/zipball/ad2a792c7e1e68f1bc9b038dc73cdcf760595fbb",
+                "reference": "ad2a792c7e1e68f1bc9b038dc73cdcf760595fbb",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.4|^8.0",
+                "symfony/process": "^4.0|^5.0|^6.0|^7.0"
+            },
+            "require-dev": {
+                "pestphp/pest-plugin-laravel": "^1.3",
+                "phpunit/phpunit": "^9.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Spatie\\PdfToText\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Freek Van der Herten",
+                    "email": "freek@spatie.be",
+                    "homepage": "https://spatie.be",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Extract text from a pdf",
+            "homepage": "https://github.com/spatie/pdf-to-text",
+            "keywords": [
+                "pdf-to-text",
+                "spatie"
+            ],
+            "support": {
+                "issues": "https://github.com/spatie/pdf-to-text/issues",
+                "source": "https://github.com/spatie/pdf-to-text/tree/1.54.1"
+            },
+            "funding": [
+                {
+                    "url": "https://spatie.be/open-source/support-us",
+                    "type": "custom"
+                }
+            ],
+            "time": "2025-06-13T15:23:19+00:00"
         },
         {
             "name": "symfony/clock",
