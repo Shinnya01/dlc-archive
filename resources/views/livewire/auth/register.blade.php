@@ -103,16 +103,6 @@ new #[Layout('components.layouts.auth')] class extends Component {
             viewable
         />
 
-        <flux:input
-            wire:model=""
-            :label="__('Studednt Number')"
-            type=""
-            required
-            autocomplete=""
-            :placeholder="__('Student Number')"
-            viewable
-        />
-
         <div class="flex items-center justify-end">
             <flux:button type="submit" variant="primary" class="w-full" data-test="register-user-button">
                 {{ __('Create account') }}
