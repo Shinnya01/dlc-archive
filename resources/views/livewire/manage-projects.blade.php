@@ -53,8 +53,13 @@
                                 @endif
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                <flux:modal.trigger name="edit-project">
                                 <flux:button icon="pencil-square" size="sm" class="mr-2 size-4"/>
+                                </flux:modal.trigger> 
+
+                                <flux:modal.trigger name="delete-project">
                                 <flux:button variant="danger" icon="trash" size="sm" class="size-4"/>
+                                </flux:modal.trigger> 
                             </td>
                         </tr>
                     @endforeach --}}
@@ -76,8 +81,12 @@
                                View
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm">
+                                 <flux:modal.trigger name="edit-project">
                                 <flux:button icon="pencil-square" size="sm" class="mr-2"/>
+                                </flux:modal.trigger> 
+                                <flux:modal.trigger name="delete-project">
                                 <flux:button variant="danger" icon="trash" size="sm" />
+                                </flux:modal.trigger>   
                             </td>
                         </tr>
                     
@@ -117,7 +126,22 @@
         <flux:input label="File" placeholder="File" />
         <div class="flex">
             <flux:spacer />
-            <flux:button type="submit" variant="primary">Create</flux:button>
+            <flux:button type="submit" variant="primary">Update</flux:button>
+        </div>
+    </div>
+    </flux:modal>
+
+    <!-- delete project -->
+     <flux:modal name="delete-project" class="md:w-96">
+    <div class="space-y-6">
+        <div>
+            <flux:heading size="lg">Delete research project</flux:heading>
+            <flux:text class="mt-2">This action can't be undone</flux:text>
+        </div>
+        <div class="flex">
+            <flux:spacer />
+            <flux:button type="submit" variant="primary">Cancel</flux:button>
+            <flux:button type="submit" variant="danger">Delete</flux:button>
         </div>
     </div>
     </flux:modal>
