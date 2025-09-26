@@ -101,10 +101,15 @@ new #[Layout('components.layouts.auth')] class extends Component {
 }; ?>
 
 <div class="flex flex-col gap-6">
+    <div class="flex gap-4 justify-center">
+      <img src="{{ asset('logo1.png') }}" alt="Logo 2" class="w-24 h-24 rounded-full" />
+       <img src="{{ asset('logo2.png') }}" alt="Logo 2" class="w-24 h-24 rounded-full" />
+    </div>
     <x-auth-header :title="__('Login - DLC Archive')" :description="__('Enter your email and password below to log in')" />
 
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
+
 
     <form method="POST" wire:submit="login" class="flex flex-col gap-6 !text-black">
         <!-- Email Address -->
