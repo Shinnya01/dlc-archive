@@ -36,7 +36,12 @@ new #[Layout('components.layouts.auth')] class extends Component {
 }; ?>
 
 <div class="flex flex-col gap-6">
-    <x-auth-header :title="__('Create an account')" :description="__('Enter your details below to create your account')" />
+
+<div class="flex gap-4 justify-center">
+      <img src="{{ asset('logo1.png') }}" alt="Logo 2" class="w-24 h-24 rounded-full" />
+       <img src="{{ asset('logo2.png') }}" alt="Logo 2" class="w-24 h-24 rounded-full" />
+    </div>
+    <x-auth-header :title="__('Sign Up - Plc Archive')" :description="__('Enter your details below to create your account')" />
 
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
@@ -82,6 +87,16 @@ new #[Layout('components.layouts.auth')] class extends Component {
             required
             autocomplete="new-password"
             :placeholder="__('Confirm password')"
+            viewable
+        />
+
+        <flux:input
+            wire:model=""
+            :label="__('Studednt Number')"
+            type=""
+            required
+            autocomplete=""
+            :placeholder="__('Student Number')"
             viewable
         />
 
