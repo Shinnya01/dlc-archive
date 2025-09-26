@@ -59,13 +59,13 @@
                 <flux:navlist.group :heading="__('Platform')" class="grid">
                     <flux:navlist.item class="{{ request()->routeIs('dashboard') ? '!text-black' : '!text-white' }}" icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
 
-                    <flux:navlist.item class="{{ request()->routeIs('inbox') ? '!text-black' : '!text-white' }}" icon="users" wire:navigate>{{ __('Manage User') }}</flux:navlist.item>
+                    <flux:navlist.item class="{{ request()->routeIs('manage-users') ? '!text-black' : '!text-white' }}" icon="users" wire:navigate :href="route('manage-users')" :current="request()->routeIs('manage-users')">{{ __('Manage User') }}</flux:navlist.item>
 
-                    <flux:navlist.item class="{{ request()->routeIs('inbox') ? '!text-black' : '!text-white' }}" icon="document-text" wire:navigate>{{ __('Manage Project') }}</flux:navlist.item>
+                    <flux:navlist.item class="{{ request()->routeIs('manage-projects') ? '!text-black' : '!text-white' }}" icon="document-text" wire:navigate :href="route('manage-projects')" :current="request()->routeIs('manage-projects')">{{ __('Manage Project') }}</flux:navlist.item>
 
-                    <flux:navlist.item  class="{{ request()->routeIs('inbox') ? '!text-black' : '!text-white' }}" icon="user-plus" wire:navigate>{{ __(' Add Admin Account') }}</flux:navlist.item>
+                    <flux:navlist.item  class="{{ request()->routeIs('admin-accounts') ? '!text-black' : '!text-white' }}" icon="user-plus" wire:navigate :href="route('admin-accounts')" :current="request()->routeIs('admin-accounts')">{{ __(' Add Admin Account') }}</flux:navlist.item>
                     
-                    <flux:navlist.item  class="{{ request()->routeIs('inbox') ? '!text-black' : '!text-white' }}" icon="inbox-arrow-down" wire:navigate>{{ __(' Inbox') }}</flux:navlist.item>
+                    <flux:navlist.item  class="{{ request()->routeIs('inbox') ? '!text-black' : '!text-white' }}" icon="inbox-arrow-down" wire:navigate :href="route('inbox')" :current="request()->routeIs('inbox')">{{ __(' Inbox') }}</flux:navlist.item>
 
 
                 </flux:navlist.group>
