@@ -8,7 +8,7 @@
             </div>
             <div class="min-h-96 text-2xl font-medium flex flex-col items-center justify-center rounded-xl border bg-stone-100 text-center shadow-xl">
                 Total Research Projects
-                <p class="text-5xl">12</p>
+                <p class="text-5xl">{{ $projectCount }}</p>
 
             </div>
             

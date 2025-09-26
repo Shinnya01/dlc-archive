@@ -14,7 +14,7 @@
 
 
     <div class="grid grid-cols-3 gap-4">
-        @foreach ($templates->skip(2) as $template)
+        @foreach ($templates as $template)
         <div>
         
         <flux:modal.trigger :name="'previewFile'.$template->id">

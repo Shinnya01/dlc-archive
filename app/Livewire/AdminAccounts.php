@@ -11,7 +11,7 @@ class AdminAccounts extends Component
 
     public function mount()
     {
-        $this->admins = User::where('role', 'admin')->get();
+        $this->admins = User::where('role', 'admin')->where('id', '!=', auth()->id())->get();
     }
 
     public function render()

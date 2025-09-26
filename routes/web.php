@@ -9,6 +9,7 @@ use App\Livewire\UserInbox;
 use App\Livewire\ManageUsers;
 use Laravel\Fortify\Features;
 use App\Livewire\AdminAccounts;
+use App\Models\ResearchProject;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Livewire\ManageProjects;
 use Illuminate\Support\Facades\Http;
@@ -31,9 +32,9 @@ Route::get('/', function () {
 Route::get('dashboard', function () {
     $userCount = User::where('role', 'user')->count();
     $name = auth()->user()->name;
-    // $projectCount = Project::count();
+    $projectCount = ResearchProject::count();
 
-    return view('dashboard', compact('userCount', 'name'));
+    return view('dashboard', compact('userCount', 'projectCount' ,'name'));
 })
 ->middleware(['auth', 'verified', 'role:admin'])
 ->name('dashboard');
