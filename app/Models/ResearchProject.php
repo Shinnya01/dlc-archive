@@ -9,6 +9,7 @@ class ResearchProject extends Model
     protected $fillable = [
         'title',
         'author',
+        'keywords',
         'year',
         'file',
     ];

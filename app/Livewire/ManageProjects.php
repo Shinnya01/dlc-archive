@@ -15,6 +15,7 @@ class ManageProjects extends Component
 {
     use WithFileUploads;
 
+    public $search = '';
 
     public $title;
     public $year;
@@ -32,9 +33,23 @@ class ManageProjects extends Component
        $this->fetchProject();
     }
 
+    public function updatedSearch()
+    {
+        // when search changes, refetch projects
+        $this->fetchProject();
+    }
+
     public function fetchProject()
     {
-        $this->projects = ResearchProject::all();
+        $query = ResearchProject::query();
+
+        if (!empty($this->search)) {
+            $query->where('title', 'like', '%' . $this->search . '%')
+                  ->orWhereJsonContains('keywords', $this->search)
+                  ->orWhereJsonContains('author', $this->search);
+        }
+
+        $this->projects = $query->get();
     }
 
     public function createProject()
@@ -67,6 +82,8 @@ class ManageProjects extends Component
             'author_file' => 'storage/'.$authorPath,
             'file'        => $projectPath,
         ]);
+
+        dd($keywordsJson);
 
         // 5. Close modal and notify
         $this->modal('create-project')->close();
@@ -202,7 +219,7 @@ class ManageProjects extends Component
                     $keywordsJson = json_encode($decoded['keywords'], JSON_UNESCAPED_UNICODE);
                 }
             }
-
+            
             return $keywordsJson;
 
         } catch (\Exception $e) {

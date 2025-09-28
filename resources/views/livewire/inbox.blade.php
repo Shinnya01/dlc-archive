@@ -52,15 +52,15 @@
                             </td>
      
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm ">
-                                {{-- @if($request->status !== 'approved') --}}
+                                @if($request->status !== 'approved')
                                     <flux:button class="mr-2" icon="check" size="sm" wire:click="approveRequest({{ $request->id }})">Approve</flux:button>
                                     <flux:button variant="danger" icon="x-mark" size="sm" wire:click="rejectRequest({{ $request->id }})">Decline</flux:button>
-                                {{-- @else --}}
-                                    <flux:button icon="eye" size="sm" wire:click="">View</flux:button>
-                                    <flux:button icon="document-arrow-down" size="sm" href="{{ asset(str_replace('public/', 'storage/', $request->pdf_path)) }}">Download</flux:button>
-
+                                @else
+                                    @if($request->pdf_path)
+                                    <flux:button icon="document-arrow-down" size="sm" href="{{ asset(str_replace('public/', 'storage/', $request->pdf_path)) }}" target="_blank">Download</flux:button>
+                                    @endif
                                     <flux:button variant="danger" icon="trash" size="sm" wire:click="rejectRequest({{ $request->id }})">Delete</flux:button>
-                                {{-- @endif --}}
+                                @endif
                             </td>
                         </tr>
                         @endforeach

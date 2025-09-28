@@ -41,7 +41,7 @@
                                 @if($request->status === 'pending')
                                     <flux:button variant="danger" icon="x-mark" size="sm" >Cancel</flux:button>
                                 @else
-                                    <flux:button class="mr-2" icon="folder-arrow-down" size="sm" href="{{ asset(str_replace('public/', 'storage/', $request->pdf_path)) }}">Download</flux:button>
+                                    <flux:button class="mr-2" icon="folder-arrow-down" size="sm" href="{{ asset(str_replace('public/', 'storage/', $request->pdf_path)) }}" target="_blank">Download</flux:button>
                                     <flux:button variant="danger" icon="x-mark" size="sm" >Delete</flux:button>
                                 @endif
                             </td>

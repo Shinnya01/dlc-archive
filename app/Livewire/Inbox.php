@@ -54,6 +54,7 @@ class Inbox extends Component
         // final extraction to JSON structure
         $acmData = $this->processChunk($client, $acmDataTemp, $this->chunkSize);
 
+        
         if($acmData){
 
         $pdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
@@ -126,9 +127,10 @@ class Inbox extends Component
 
         // --- SECTIONS ---
         $sections = [
-            '1. INTRODUCTION' => $acmData['introduction'] ?? '',
-            '2. PURPOSE OF DESCRIPTION' => $acmData['purposeOfDescription'] ?? '',
-            '3. METHODOLOGY' => ($acmData['methodology'] ?? '') . "\n\n" . ($acmData['methodologyDesign'] ?? '')
+            'INTRODUCTION' => $acmData['introduction'] ?? '',
+            'PURPOSE OF DESCRIPTION' => $acmData['purposeOfDescription'] ?? '',
+            'METHODOLOGY' => $acmData['methodology'] ?? '',
+            'METHODOLOGY DESIGN' => $acmData['methodologyDesign'] ?? ''
         ];
 
         foreach ($sections as $title => $content) {
@@ -145,7 +147,7 @@ class Inbox extends Component
         if (!empty($acmData['table']['columns']) && !empty($acmData['table']['rows'])) {
             $pdf->Ln(2);
             $pdf->SetFont('times', 'B', 11);
-            $pdf->Cell(0, 6, '4. EVALUATION RESULTS', 0, 1);
+            $pdf->Cell(0, 6, 'EVALUATION RESULTS', 0, 1);
             $pdf->SetFont('times', '', 10);
 
             $tbl = '<table border="1" cellpadding="3" cellspacing="0">';
@@ -179,14 +181,38 @@ class Inbox extends Component
 
         // --- REFERENCES ---
         if (!empty($acmData['references'])) {
+
+            // Step 1: Remove empty, URL, or duplicate entries
+            $validReferences = array_filter($acmData['references'], function($ref) {
+                $ref = trim($ref);
+                return !empty($ref) && preg_match('/[A-Za-z0-9]/', $ref) && !preg_match('#^https?://#i', $ref);
+            });
+            $validReferences = array_unique($validReferences);
+
+            // Step 2: Keep only entries that look like real references
+            $validReferences = array_filter($validReferences, function($ref) {
+                // Keep if contains a 4-digit year (e.g., 2021) OR "Author, ..." pattern
+                return preg_match('/\d{4}/', $ref) || preg_match('/[A-Z][a-z]+,\s*[A-Z]?/', $ref);
+            });
+
+            // Step 3: Remove existing numbering (e.g., "1. ")
+            $validReferences = array_map(function($ref) {
+                return preg_replace('/^\s*\d+\.\s*/', '', $ref);
+            }, $validReferences);
+
+            // Step 4: Re-number references consistently
+            $numberedReferences = [];
+            foreach ($validReferences as $i => $ref) {
+                $numberedReferences[] = ($i + 1) . ". " . $ref;
+            }
+
+            // Combine all references into one block
+            $refsText = implode("\n", $numberedReferences);
+
+            // PDF output
             $pdf->SetFont('times', 'B', 11);
             $pdf->Cell(0, 6, 'REFERENCES', 0, 1);
             $pdf->SetFont('times', '', 10);
-
-            // Combine all references into one block, separated by newlines
-            $refsText = implode("\n", $acmData['references']);
-
-            // Output once with justification
             $pdf->MultiCell(0, 5, $refsText, 0, 'J');
         }
 
@@ -200,10 +226,11 @@ class Inbox extends Component
         $request->pdf_path = $path;
         $request->status = 'approved';
         $request->save();
-        
+
+        $this->fetchRequest();
         Toaster::success('Request Approve and ACM Generated Successfully!');
         }
-
+    
         // Example of generating PDF:
         // $pdf = Pdf::loadView('pdf.acm-template', compact('acmData', 'authors'));
         // return $pdf->download('sample_acm.pdf');
@@ -516,15 +543,20 @@ class Inbox extends Component
                     }
 
                     foreach ($Data as $key => $value) {
-                    if ($key === 'references' && is_array($value)) {
-                        $merged['references'] = array_merge($merged['references'], $value);
-                    } else if ($key === 'table' && is_array($value)) {
-                        if (empty($merged['table'])) {
-                            $merged['table'] = $value;
+                        if ($key === 'references' && is_array($value)) {
+                            $merged['references'] = array_merge($merged['references'], $value);
+                        } else if ($key === 'table' && is_array($value)) {
+                            if (empty($merged['table'])) {
+                                $merged['table'] = $value;
+                            }
+                        } else {
+                            if (empty($merged[$key]) && !empty($value)) {
+                                $merged[$key] = trim($value);
+                            }
                         }
-                    } else {
-                        $merged[$key] = trim($merged[$key] . ' ' . $value);
                     }
+                    if (!empty($merged['references'])) {
+                        $merged['references'] = array_unique($merged['references']);
                     }
                 }
 

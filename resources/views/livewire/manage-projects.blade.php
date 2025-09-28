@@ -2,7 +2,8 @@
     {{-- To attain knowledge, add things every day; To attain wisdom, subtract things every day. --}}
     <div class="flex items-center justify-between">
         <h1 class="text-4xl font-bold text-red-900">Manage Research Projects</h1>
-        <div class="flex justify-end w-lg">
+        <div class="flex justify-end w-lg gap-2">
+            <flux:input icon="magnifying-glass" placeholder="Search title, keywords or author" wire:model.live="search"  />
             <flux:modal.trigger name="create-project">
             <flux:button icon="plus" class="cursor-pointer">Create Project</flux:button>
             </flux:modal.trigger>
@@ -22,9 +23,6 @@
                         <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
                             Year
                         </th>
-                        {{-- <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
-                            Uploaded At
-                        </th> --}}
                         <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
                             File
                         </th>

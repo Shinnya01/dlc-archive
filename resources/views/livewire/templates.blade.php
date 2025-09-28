@@ -15,14 +15,14 @@
 
     <div class="grid grid-cols-3 gap-4">
         @foreach ($templates as $template)
-        <div>
+        <div wire:key="{{ $template->id }}">
         
         <flux:modal.trigger :name="'previewFile'.$template->id">
         <button class="cursor-pointer h-auto w-full bg-white shadpw-xl flex gap-4 items-center p-4 rounded-xl"
             >
             <flux:avatar :name="$template->title" size="sm" circle  class="my-auto size-12 !bg-red-800 !text-white !text-xl"/>
             <div>
-                <h2 class="text-lg text-left font-semibold text-black">{{ $template->title }}</h2>
+                <h2 class="text-lg text-left font-semibold text-black">{{ $template->title }} </h2>
                 <p class="text-sm text-gray-500">
                     @php
                         $authors = json_decode($template->author, true);

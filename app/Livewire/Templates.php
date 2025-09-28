@@ -10,7 +10,6 @@ use App\Models\ResearchProject;
 class Templates extends Component
 {
 
-    public $showModal = false;
     public $currentFile;
     public $currentFileType;
 
@@ -27,10 +26,12 @@ class Templates extends Component
     {
         // dd($this->purpose . ' ' . $id);
 
+
         $existing = Request::where('user_id', auth()->id())
-                          ->where('research_project_id', $id)
-                          ->first();
-        
+                        ->where('research_project_id', $id)
+                        ->exists();
+
+       
         if ($existing) {
             $this->purpose = '';
             $this->modal('previewFile'.$id)->close();
