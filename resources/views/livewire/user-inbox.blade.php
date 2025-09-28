@@ -11,43 +11,42 @@
                 <thead class="bg-amber-100">
                     <tr class="">
                         <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
-                            Requester
-                        </th>
-                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
                             Title
                         </th>
                         <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
                             Request Purpose
                         </th>
                         <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
-                            Status
+                            Request Purpose
                         </th>
-           
                         <th class="px-6 py-3 text-right text-sm font-bold text-gray-700 uppercase tracking-wider">
                             Actions
                         </th>
                     </tr>
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
-                    <tr>
+                    @foreach ($requests as $request)
+                        <tr>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                Jhon Doe
+                                {{ $request->researchProject->title }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                Capstone ni jhonmar
+                                {{ $request->purpose }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                Ipapasa kay rommel
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                Pending
+                                {{ $request->status }}
                             </td>
      
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm ">
-                                <flux:button class="mr-2" icon="folder-arrow-down" size="sm">Download</flux:button>
-                                <flux:button variant="danger" icon="x-mark" size="sm" >Delete</flux:button>
+                                @if($request->status === 'pending')
+                                    <flux:button variant="danger" icon="x-mark" size="sm" >Cancel</flux:button>
+                                @else
+                                    <flux:button class="mr-2" icon="folder-arrow-down" size="sm" href="{{ asset(str_replace('public/', 'storage/', $request->pdf_path)) }}">Download</flux:button>
+                                    <flux:button variant="danger" icon="x-mark" size="sm" >Delete</flux:button>
+                                @endif
                             </td>
-                        </tr>
+                        </tr>                 
+                    @endforeach
                 </tbody>
             </table>
         </div>

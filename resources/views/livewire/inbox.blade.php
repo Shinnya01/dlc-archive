@@ -57,7 +57,8 @@
                                     <flux:button variant="danger" icon="x-mark" size="sm" wire:click="rejectRequest({{ $request->id }})">Decline</flux:button>
                                 {{-- @else --}}
                                     <flux:button icon="eye" size="sm" wire:click="">View</flux:button>
-                                    <flux:button icon="document-arrow-down" size="sm" wire:click="">Download</flux:button>
+                                    <flux:button icon="document-arrow-down" size="sm" href="{{ asset(str_replace('public/', 'storage/', $request->pdf_path)) }}">Download</flux:button>
+
                                     <flux:button variant="danger" icon="trash" size="sm" wire:click="rejectRequest({{ $request->id }})">Delete</flux:button>
                                 {{-- @endif --}}
                             </td>
