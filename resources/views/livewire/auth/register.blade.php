@@ -7,6 +7,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rules;
 use Livewire\Attributes\Layout;
 use Livewire\Volt\Component;
+use App\Mail\PendingApprovalMail;
+use Illuminate\Support\Facades\Mail;
+
 
 new #[Layout('components.layouts.auth')] class extends Component {
     public string $name = '';
@@ -34,7 +37,8 @@ new #[Layout('components.layouts.auth')] class extends Component {
 
         Auth::login($user);
 
-        $this->redirectIntended(route('dashboard', absolute: false), navigate: true);
+        $this->redirectIntended(route('home', absolute: false), navigate: true);
+        Mail::to($user->email)->send(new PendingApprovalMail($user->name));
     }
 }; ?>
 

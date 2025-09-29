@@ -20,6 +20,9 @@
                         <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
                             Email
                         </th>
+                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                            Status
+                        </th>
                         <th class="px-6 py-3 text-right text-sm font-bold text-gray-700 uppercase tracking-wider">
                             Actions
                         </th>
@@ -37,22 +40,40 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                 {{ $user->email }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm ">
-
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                {{ $user->status }}
+                            </td>
+                            <td class="px-6 py-4 flex gap-2 justify-end whitespace-nowrap text-sm">
+                            @if($user->status === 'pending')
+                                <flux:button class="mr-2" icon="check" size="sm" class="!bg-green-500 !text-white" wire:click="approveUser({{ $user->id }})">Verify</flux:button>
+                            @endif
                             <flux:modal.trigger name="edit-user">
-                                <flux:button class="mr-2" icon="pencil-square" size="sm" class="size-4"/>
-                            </flux:modal.trigger>    
+                                <flux:button class="mr-2" icon="pencil-square" size="sm" class=""/>
+                            </flux:modal.trigger> 
                              <flux:modal.trigger name="delete-user">
-                                <flux:button variant="danger" icon="trash" size="sm" class="size-4"/>
+                                <flux:button variant="danger" icon="trash" size="sm" class=""/>
                             </flux:modal.trigger>   
                             </td>
                         </tr>
+                     <flux:modal name="delete-user" class="md:w-96">
+                        <div class="space-y-6">
+                            <div>
+                                <flux:heading :name="'delete-user'.$user->id" size="lg">Are you sure to delete this user?</flux:heading>
+                                <flux:text class="mt-2">This action can't be undone</flux:text>
+                            </div>
+                            <div class="flex">
+                                <flux:spacer />
+                                <flux:button type="submit" variant="primary">Cancel</flux:button>
+                                <flux:button type="submit" variant="danger" wire:click="removeUser({{ $user->id }})">Delete</flux:button>
+                            </div>
+                        </div>
+                    </flux:modal>
                     @endforeach
                 </tbody>
             </table>
         </div>
       <!-- update user modal -->
-                <flux:modal name="edit-user" class="md:w-96">
+        <flux:modal name="edit-user" class="md:w-96">
             <div class="space-y-6">
                 <div>
                     <flux:heading size="lg">Update user</flux:heading>
@@ -69,18 +90,6 @@
         </flux:modal>
 
         <!-- delete user moda -->
-           <flux:modal name="delete-user" class="md:w-96">
-            <div class="space-y-6">
-                <div>
-                    <flux:heading size="lg">Are you sure to delete this user?</flux:heading>
-                    <flux:text class="mt-2">This action can't be undone</flux:text>
-                </div>
-                <div class="flex">
-                    <flux:spacer />
-                    <flux:button type="submit" variant="primary">Cancel</flux:button>
-                    <flux:button type="submit" variant="danger">Delete</flux:button>
-                </div>
-            </div>
-        </flux:modal>
+          
     </div>
 </div>
