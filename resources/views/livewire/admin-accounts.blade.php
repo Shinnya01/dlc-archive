@@ -43,39 +43,83 @@
                                 </flux:modal.trigger>
                             </td>
                         </tr>
-                                <flux:modal :name="'delete-admin'.$admin->id" class="md:w-96">
-                                    <div class="space-y-6">
-                                            <div>
-                                                <flux:heading size="lg">Are you sure to delete this {{ $admin->name }}?</flux:heading>
-                                                <flux:text class="mt-2">This action can't be undone</flux:text>
-                                            </div>
 
-                                            <div class="flex">
-                                                <flux:spacer />
-                                                <flux:button type="cancel" variant="primary">Cancel</flux:button>
-                                                <flux:button type="delete" variant="danger" wire:click="removeAdmin({{ $admin->id }})">Delete</flux:button>
-                                            </div>
-                                    </div>
+                          <!-- Delete modal -->
+                         <flux:modal :name="'delete-admin' . $admin->id" class="md:w-96">
+                                    <div class="space-y-6">
+                                        <!-- Header -->
+                                        <d class="text-start">
+                                            <flux:heading size="lg" class="text-red-600">Delete Admin</flux:heading>
+                                            <flux:text class="mt-2 text-gray-600">
+                                                 Are you sure you want to delete 
+                                                 <span class="font-semibold text-gray-900">{{ $admin->name }}</span>?
+                                            </flux:text>
+                                            <flux:text class="mt-1 text-sm text-gray-500">
+                                                  This action cannot be undone.
+                                              </flux:text>
+                                         </d
+                                        <!-- Action Buttons -->
+                                        <br>
+                                        <div class="flex justify-end space-x-3">
+                                  
+                                               <flux:button variant="ghost"  x-on:click="$dispatch('close-modal', { name: 'add-admin' })">
+                                                Cancel
+                                            </flux:button>
+                                              <flux:button 
+                                                 type="delete" 
+                                                   variant="danger" 
+                                                   class="px-4 py-2" 
+                                                wire:click="removeAdmin({{ $admin->id }})"
+                                              >
+                                                 Delete
+                                             </flux:button>
+                                         </div>
+                                     </div>
                                 </flux:modal>
 
-                                <flux:modal :name="'update-admin'.$admin->id" class="min-w-sm">
-                                    <form wire:submit.prevent="updateAdmin({{$admin->id}})">
-                                        <div class="space-y-6">
-                                                <div>
-                                                    <flux:heading size="lg"> Edit admin</flux:heading>
-                                                    <flux:text class="mt-2">Edit admin acc</flux:text>
-                                                </div>
-                                                <flux:input label="Name"  wire:model.defer="updateName" placeholder="e.g. Juan Carlo" />
-                                                <flux:input label="Email" wire:model.defer="updateEmail" placeholder="e.g. juan@gmail.com" />
-                                                
-                                                <div class="flex">
-                                                    <flux:spacer />
-                                                    <flux:button type="submit" wire:model variant="primary">Update</flux:button>
-                                                </div>
+                                <!-- edit modal -->
+                                <flux:modal :name="'update-admin' . $admin->id" class="md:w-96">
+                                    <form wire:submit.prevent="updateAdmin({{ $admin->id }})" class="space-y-6">
+                                        <!-- Header -->
+                                        <div class="text-start">
+                                            <flux:heading size="lg">Update Admin</flux:heading>
+                                            <flux:text class="mt-2 text-gray-600">
+                                                Modify the details for 
+                                                <span class="font-semibold text-gray    -900">{{ $admin->name }}</span>.
+                                            </flux:text>
+                                        </div>
+
+                                        <br>
+
+                                        <!-- Input Fields -->
+                                        <flux:input 
+                                            label="Full Name"  
+                                            wire:model.defer="updateName" 
+                                            placeholder="e.g. Juan Carlo" 
+                                        />
+                                      <br>
+                                        <flux:input 
+                                            label="Email Address" 
+                                            wire:model.defer="updateEmail" 
+                                            placeholder="e.g. juan@gmail.com" 
+                                        />
+                                       <br>
+                                        <!-- Action Buttons -->
+                                        <div class="flex justify-end space-x-3">
+
+                                     
+
+                                            <flux:button type="cancel" variant="ghost" >
+                                                Cancel
+                                            </flux:button>
+                                            <flux:button type="submit" variant="primary">
+                                                Update
+                                            </flux:button>
                                         </div>
                                     </form>
-                            </flux:modal>
+                                </flux:modal>
                     @endforeach
+                    @fluxScripts
                 </tbody>
             </table>
         </div>
