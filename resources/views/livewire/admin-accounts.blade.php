@@ -70,7 +70,7 @@
                                                 
                                                 <div class="flex">
                                                     <flux:spacer />
-                                                    <flux:button type="submit" variant="primary">Update</flux:button>
+                                                    <flux:button type="submit" wire:model variant="primary">Update</flux:button>
                                                 </div>
                                         </div>
                                     </form>
