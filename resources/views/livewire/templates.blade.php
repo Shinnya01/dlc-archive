@@ -62,7 +62,7 @@
             </flux:modal.trigger>
 
             <!-- Modal -->
-            <flux:modal :name="'previewFile'.$template->id" class="min-w-[90vw] md:min-w-[60vw] max-w-5xl space-y-2 cursor-not-allowed" wire:model="showModal">
+            <flux:modal :name="'previewFile'.$template->id" class="min-w-[90vw] md:min-w-[60vw] max-w-5xl space-y-2" wire:model="showModal">
                 @php
                     $filePath = $template->file;
                     $fileExtension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
