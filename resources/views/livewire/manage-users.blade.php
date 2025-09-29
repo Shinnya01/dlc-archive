@@ -55,6 +55,19 @@
                             </flux:modal.trigger>   
                             </td>
                         </tr>
+                     <flux:modal name="delete-user" class="md:w-96">
+                        <div class="space-y-6">
+                            <div>
+                                <flux:heading :name="'delete-user'.$user->id" size="lg">Are you sure to delete this user?</flux:heading>
+                                <flux:text class="mt-2">This action can't be undone</flux:text>
+                            </div>
+                            <div class="flex">
+                                <flux:spacer />
+                                <flux:button type="submit" variant="primary">Cancel</flux:button>
+                                <flux:button type="submit" variant="danger" wire:click="removeUser({{ $user->id }})">Delete</flux:button>
+                            </div>
+                        </div>
+                    </flux:modal>
                     @endforeach
                 </tbody>
             </table>
@@ -77,18 +90,6 @@
         </flux:modal>
 
         <!-- delete user moda -->
-           <flux:modal name="delete-user" class="md:w-96">
-            <div class="space-y-6">
-                <div>
-                    <flux:heading size="lg">Are you sure to delete this user?</flux:heading>
-                    <flux:text class="mt-2">This action can't be undone</flux:text>
-                </div>
-                <div class="flex">
-                    <flux:spacer />
-                    <flux:button type="submit" variant="primary">Cancel</flux:button>
-                    <flux:button type="submit" variant="danger">Delete</flux:button>
-                </div>
-            </div>
-        </flux:modal>
+          
     </div>
 </div>

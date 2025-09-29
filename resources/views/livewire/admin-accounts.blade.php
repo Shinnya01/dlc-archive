@@ -43,19 +43,38 @@
                                 </flux:modal.trigger>
                             </td>
                         </tr>
-                                <flux:modal :name="'delete-admin'.$admin->id" class="md:w-96">
-                                    <div class="space-y-6">
-                                            <div>
-                                                <flux:heading size="lg">Are you sure to delete this {{ $admin->name }}?</flux:heading>
-                                                <flux:text class="mt-2">This action can't be undone</flux:text>
-                                            </div>
 
-                                            <div class="flex">
-                                                <flux:spacer />
-                                                <flux:button type="cancel" variant="primary">Cancel</flux:button>
-                                                <flux:button type="delete" variant="danger" wire:click="removeAdmin({{ $admin->id }})">Delete</flux:button>
-                                            </div>
-                                    </div>
+                          <!-- Delete modal -->
+                         <flux:modal :name="'delete-admin' . $admin->id" class="md:w-96">
+                                    <div class="space-y-6">
+                                        <!-- Header -->
+                                        <d class="text-start">
+                                            <flux:heading size="lg" class="text-red-600">Delete Admin</flux:heading>
+                                            <flux:text class="mt-2 text-gray-600">
+                                                 Are you sure you want to delete 
+                                                 <span class="font-semibold text-gray-900">{{ $admin->name }}</span>?
+                                            </flux:text>
+                                            <flux:text class="mt-1 text-sm text-gray-500">
+                                                  This action cannot be undone.
+                                              </flux:text>
+                                         </d
+                                        <!-- Action Buttons -->
+                                        <br>
+                                        <div class="flex justify-end space-x-3">
+                                  
+                                               <flux:button variant="ghost"  x-on:click="$dispatch('close-modal', { name: 'add-admin' })">
+                                                Cancel
+                                            </flux:button>
+                                              <flux:button 
+                                                 type="delete" 
+                                                   variant="danger" 
+                                                   class="px-4 py-2" 
+                                                wire:click="removeAdmin({{ $admin->id }})"
+                                              >
+                                                 Delete
+                                             </flux:button>
+                                         </div>
+                                     </div>
                                 </flux:modal>
 
                          <flux:modal :name="'update-admin'.$admin->id" class="min-w-sm">
@@ -88,6 +107,7 @@
                         </flux:modal>
 
                     @endforeach
+                    @fluxScripts
                 </tbody>
             </table>
         </div>
