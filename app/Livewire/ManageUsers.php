@@ -18,7 +18,7 @@ class ManageUsers extends Component
      public function fetchUser()
     {
         $this->users = User::where('role', 'user')
-                        ->get();
+                            ->get();
     }
 
     public function removeUser($id)
@@ -29,6 +29,18 @@ class ManageUsers extends Component
         $this->fetchUser();
         $this->modal('delete-user'.$id)->close();
         Toaster::success('User Removed Successfully!');
+    }
+
+
+
+    public function approveUser($id)
+    {
+        $user = User::find($id);
+        $user->status = 'verified';
+
+        $user->save();
+        $this->fetchUsers();
+        Toaster::success('User Verified Successfully!');
     }
     
     public function render()
