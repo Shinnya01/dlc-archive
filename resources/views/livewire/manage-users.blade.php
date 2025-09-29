@@ -20,6 +20,9 @@
                         <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
                             Email
                         </th>
+                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                            Status
+                        </th>
                         <th class="px-6 py-3 text-right text-sm font-bold text-gray-700 uppercase tracking-wider">
                             Actions
                         </th>
@@ -37,13 +40,18 @@
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                 {{ $user->email }}
                             </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm ">
-
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                {{ $user->status }}
+                            </td>
+                            <td class="px-6 py-4 flex gap-2 justify-end whitespace-nowrap text-sm">
+                            @if($user->status === 'pending')
+                                <flux:button class="mr-2" icon="check" size="sm" class="!bg-green-500 !text-white" wire:click="approveUser({{ $user->id }})">Verify</flux:button>
+                            @endif
                             <flux:modal.trigger name="edit-user">
-                                <flux:button class="mr-2" icon="pencil-square" size="sm" class="size-4"/>
-                            </flux:modal.trigger>    
+                                <flux:button class="mr-2" icon="pencil-square" size="sm" class=""/>
+                            </flux:modal.trigger> 
                              <flux:modal.trigger name="delete-user">
-                                <flux:button variant="danger" icon="trash" size="sm" class="size-4"/>
+                                <flux:button variant="danger" icon="trash" size="sm" class=""/>
                             </flux:modal.trigger>   
                             </td>
                         </tr>
