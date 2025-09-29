@@ -65,7 +65,7 @@
             </table>
         </div>
       <!-- update user modal -->
-                <flux:modal name="edit-user" class="md:w-96">
+        <flux:modal name="edit-user" class="md:w-96">
             <div class="space-y-6">
                 <div>
                     <flux:heading size="lg">Update user</flux:heading>

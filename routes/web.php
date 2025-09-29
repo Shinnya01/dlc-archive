@@ -16,7 +16,9 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    if(auth()->check()) {
+    
+
+    if(auth()->check() && auth()->user()->status === 'verified') {
 
         if(auth()->user()->isUser()){
             return redirect()->route('templates');
@@ -24,10 +26,23 @@ Route::get('/', function () {
             return redirect()->route('dashboard');
         }
 
+    }elseif(auth()->check() && auth()->user()->status === 'pending'){
+
+            return redirect()->route('not-verified');
+
     }else{
+        
         return redirect()->route('login');
     }
 })->name('home');
+
+Route::get('not-verified', function(){
+    if(auth()->user()->status === 'pending'){
+        return view('not-verified');
+    }else{
+        return redirect()->route('home');
+    }
+})->name('not-verified');
 
 Route::get('dashboard', function () {
     $userCount = User::where('role', 'user')->count();
@@ -176,7 +191,7 @@ Route::get('/test-pdf', function () {
     "keywords" => "DHVSU, web-based system, sentiment analysis, performance evaluation, teaching quality, educational standards, faculty evaluation",
     ];
 
-$authors = [
+    $authors = [
     [
         "name" => "Jane Doe",
         "program" => "Bachelor of Science in CS",
@@ -201,7 +216,7 @@ $authors = [
         "email" => "alice.reyes@example.com",
         "contact" => "+63 917 555 1234",
     ],
-];
+    ];
 
 
     // Load the Blade view

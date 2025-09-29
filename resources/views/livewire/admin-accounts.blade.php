@@ -77,47 +77,35 @@
                                      </div>
                                 </flux:modal>
 
-                                <!-- edit modal -->
-                                <flux:modal :name="'update-admin' . $admin->id" class="md:w-96">
-                                    <form wire:submit.prevent="updateAdmin({{ $admin->id }})" class="space-y-6">
-                                        <!-- Header -->
-                                        <div class="text-start">
-                                            <flux:heading size="lg">Update Admin</flux:heading>
-                                            <flux:text class="mt-2 text-gray-600">
-                                                Modify the details for 
-                                                <span class="font-semibold text-gray    -900">{{ $admin->name }}</span>.
-                                            </flux:text>
-                                        </div>
+                         <flux:modal :name="'update-admin'.$admin->id" class="min-w-sm">
+                            <div class="space-y-6 transition">
+                                @if ($selectedAdmin && $selectedAdmin->id === $admin->id)
+                                    <div>
+                                        <flux:heading size="lg">Edit admin</flux:heading>
+                                        <flux:text class="mt-2">Edit admin acc</flux:text>
+                                    </div>
+                                    <flux:input label="Name" wire:model.defer="updateName" placeholder="e.g. Juan Carlo" />
+                                    <flux:input label="Email" wire:model.defer="updateEmail" placeholder="e.g. juan@gmail.com" />
+                                    
+                                    <div class="flex">
+                                        <flux:spacer />
+                                        <flux:button 
+                                            type="submit" 
+                                            variant="primary" 
+                                            wire:click="updateAdmin({{ $admin->id }})" 
+                                            wire:loading.attr="disabled">
+                                                <span wire:loading.remove>Update</span>
+                                                <span wire:loading>Updating...</span>
+                                        </flux:button>
+                                    </div>
+                                @else
+                                    <div class="flex justify-center p-6">
+                                        <flux:icon.loading size="lg" /> <!-- Shows loading spinner -->
+                                    </div>
+                                @endif
+                            </div>
+                        </flux:modal>
 
-                                        <br>
-
-                                        <!-- Input Fields -->
-                                        <flux:input 
-                                            label="Full Name"  
-                                            wire:model.defer="updateName" 
-                                            placeholder="e.g. Juan Carlo" 
-                                        />
-                                      <br>
-                                        <flux:input 
-                                            label="Email Address" 
-                                            wire:model.defer="updateEmail" 
-                                            placeholder="e.g. juan@gmail.com" 
-                                        />
-                                       <br>
-                                        <!-- Action Buttons -->
-                                        <div class="flex justify-end space-x-3">
-
-                                     
-
-                                            <flux:button type="cancel" variant="ghost" >
-                                                Cancel
-                                            </flux:button>
-                                            <flux:button type="submit" variant="primary">
-                                                Update
-                                            </flux:button>
-                                        </div>
-                                    </form>
-                                </flux:modal>
                     @endforeach
                     @fluxScripts
                 </tbody>
