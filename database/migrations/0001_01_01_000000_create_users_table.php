@@ -19,7 +19,7 @@ return new class extends Migration
             $table->string('password');
             $table->string('student_number')->unique()->nullable();
             $table->enum('role', ['admin', 'user'])->default('user');
-            $table->enum('status', ['pending', 'approved'])->default('pending');
+            $table->enum('status', ['pending', 'verified'])->default('pending');
             $table->rememberToken();
             $table->timestamps();
         });

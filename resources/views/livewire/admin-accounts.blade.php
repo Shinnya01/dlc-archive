@@ -58,23 +58,35 @@
                                     </div>
                                 </flux:modal>
 
-                                <flux:modal :name="'update-admin'.$admin->id" class="min-w-sm">
-                                    <form wire:submit.prevent="updateAdmin({{$admin->id}})">
-                                        <div class="space-y-6">
-                                                <div>
-                                                    <flux:heading size="lg"> Edit admin</flux:heading>
-                                                    <flux:text class="mt-2">Edit admin acc</flux:text>
-                                                </div>
-                                                <flux:input label="Name"  wire:model.defer="updateName" placeholder="e.g. Juan Carlo" />
-                                                <flux:input label="Email" wire:model.defer="updateEmail" placeholder="e.g. juan@gmail.com" />
-                                                
-                                                <div class="flex">
-                                                    <flux:spacer />
-                                                    <flux:button type="submit" variant="primary">Update</flux:button>
-                                                </div>
-                                        </div>
-                                    </form>
-                            </flux:modal>
+                         <flux:modal :name="'update-admin'.$admin->id" class="min-w-sm">
+                            <div class="space-y-6 transition">
+                                @if ($selectedAdmin && $selectedAdmin->id === $admin->id)
+                                    <div>
+                                        <flux:heading size="lg">Edit admin</flux:heading>
+                                        <flux:text class="mt-2">Edit admin acc</flux:text>
+                                    </div>
+                                    <flux:input label="Name" wire:model.defer="updateName" placeholder="e.g. Juan Carlo" />
+                                    <flux:input label="Email" wire:model.defer="updateEmail" placeholder="e.g. juan@gmail.com" />
+                                    
+                                    <div class="flex">
+                                        <flux:spacer />
+                                        <flux:button 
+                                            type="submit" 
+                                            variant="primary" 
+                                            wire:click="updateAdmin({{ $admin->id }})" 
+                                            wire:loading.attr="disabled">
+                                                <span wire:loading.remove>Update</span>
+                                                <span wire:loading>Updating...</span>
+                                        </flux:button>
+                                    </div>
+                                @else
+                                    <div class="flex justify-center p-6">
+                                        <flux:icon.loading size="lg" /> <!-- Shows loading spinner -->
+                                    </div>
+                                @endif
+                            </div>
+                        </flux:modal>
+
                     @endforeach
                 </tbody>
             </table>
