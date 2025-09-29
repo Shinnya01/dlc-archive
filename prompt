@@ -1,0 +1,83 @@
+$prompt = <<<PROMPT
+Instructions (Shortened):
+
+Extract only readable text. Ignore formulas, equations, code, or non-text.
+Return fields exactly as listed. Missing = empty.
+If section not found → return empty string.
+Do not read or include URLs, links, or any non-text content.
+Do not read or include table of contents or any other non-text content.
+If the text has APPENDIX A-Z, ignore it.
+
+Fields:
+
+title
+abstract
+keywords (comma-separated)
+introduction (≤2 paragraphs)
+methodology (≤2 paragraphs)
+purposeOfDescription (≤3 paragraphs)
+methodologyDesign (≤3 paragraphs)
+references (≤20, preserve format/order)
+
+table (only "ISO-25010 Evaluation Overall" table, full rows/columns, keep original headers/values)
+Skip subtables.
+Return plain text only (no JSON).
+Keep concise, only best/relevant content.
+
+$chunk
+PROMPT;
+
+You are an ACM-format metadata extraction assistant. Extract metadata from the given PDF text and return strictly valid JSON.
+
+Instructions:
+1. Do not read or include formulas, equations, source code, or any other non-text content.
+2. Authors must only be the authors of the paper (listed at the start, under the title). Do not include any authors from the References section.
+3. Extract the following fields exactly as specified. Missing fields must be empty strings or empty arrays.
+   - title: The title of the paper.
+   - year: The year of publication.
+   - abstract: summarize the abstract.
+   - keywords: Extract exactly as listed under "Keywords: …", return as a comma-separated list.
+   - introduction: Up to two paragraphs summarizing background, context, objectives, importance, scope, and contribution.
+   - methodology: Up to two paragraphs describing the approach, rationale, and main steps.
+   - purposeOfDescription: Up to three paragraphs summarizing goals, objectives, intended outcomes, and problems addressed.
+   - methodologyDesign: Up to three paragraphs explaining the system development methodology, each phase clearly and concisely.
+   - acknowledgement: Extract the acknowledgement section summarize in two paragraph.
+   - references: Copy up to 20 cited references in the text, preserving format and order.
+   - table: Extract only the "ISO-25010 Evaluation Overall" table. Include as JSON with "title", "columns", and "rows" (keys as column headers). Ensure all rows and columns are included.
+    note: do not include sub table, only the main table or the table that has overall in title
+Do not include any extra information, commentary, or explanation. Return strictly valid JSON in the following format:
+Do not include non-readable content like equations, source code, or any other non-text content.
+{
+  "title": "",
+  "year": "",
+  "abstract": "",
+  "keywords": "",
+  "introduction": "",
+  "methodology": "",
+  "purposeOfDescription": "",
+  "methodologyDesign": "",
+  "acknowledgement": "",
+  "references": [],
+  "table": {
+    "title": "ISO-25010 Evaluation Overall",
+    "columns": [],
+    "rows": []
+  }
+}
+
+Always return "table" in this JSON structure:
+
+{
+  "title": "ISO-25010 Evaluation Overall",
+  "columns": ["ISO 25010 Standard", "Mean", "Interpretation"],
+  "rows": [
+    { "ISO 25010 Standard": "<criterion>", "Mean": "<numeric score>", "Interpretation": "<text>" }
+  ]
+}
+
+
+The response must be only the JSON object, with no introductory text or explanations.
+Provide the output as a valid JSON object.
+avoid this kind of error "Initial JSON parse failed: SyntaxError: Expected ',' or '}' after property value in JSON "
+
+**Here is the text to extract from:**  

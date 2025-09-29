@@ -83,7 +83,7 @@ class ManageProjects extends Component
             'file'        => $projectPath,
         ]);
 
-        dd($keywordsJson);
+        // dd($keywordsJson);
 
         // 5. Close modal and notify
         $this->modal('create-project')->close();
