@@ -4,7 +4,7 @@
         @include('partials.head')
     </head>
     <body class="min-h-screen bg-white">
-        <flux:sidebar sticky stashable class="border-e border-zinc-200 bg-red-950 !text-yellow-500">
+        <flux:sidebar sticky class="border-e border-zinc-200 bg-red-950 !text-yellow-500">
            
             <!-- Desktop User Menu -->
             <flux:dropdown position="bottom" align="start">
@@ -95,5 +95,6 @@
         {{ $slot }}
 
         @fluxScripts
+
     </body>
 </html>

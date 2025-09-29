@@ -15,7 +15,11 @@
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
         "livewire/flux": "^2.1.1",
-        "livewire/volt": "^1.7.0"
+        "livewire/volt": "^1.7.0",
+        "masmerise/livewire-toaster": "^2.8",
+        "smalot/pdfparser": "^2.12",
+        "spatie/pdf-to-text": "^1.54",
+        "tecnickcom/tcpdf": "^6.10"
     },
     "require-dev": {
         "fakerphp/faker": "^1.23",

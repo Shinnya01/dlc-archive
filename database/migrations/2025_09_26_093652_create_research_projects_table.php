@@ -11,9 +11,10 @@ return new class extends Migration
         Schema::create('research_projects', function (Blueprint $table) {
             $table->id();
             $table->string('title');
-            $table->string('author');
-            $table->year('year'); // or $table->integer('year') if you prefer
-            $table->string('file')->nullable(); // path or filename for uploaded file
+            $table->year('year');
+            $table->json('author')->nullable();
+            $table->json('keywords')->nullable();
+            $table->string('file')->nullable(); 
             $table->timestamps();
         });
     }

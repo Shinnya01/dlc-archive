@@ -3,7 +3,9 @@
     <div class="flex items-center justify-between">
         <h1 class="text-4xl font-bold text-red-900">Manage Admin</h1>
         <div class="flex justify-end w-lg">
+            <flux:modal.trigger name="add-admin">
             <flux:button icon="plus" class="cursor-pointer">Create Admin</flux:button>
+            </flux:modal.trigger>
         </div>
     </div>
     <div class="mt-6 p-4 bg-white rounded-xl">
@@ -32,14 +34,75 @@
                                 {{ $admin->email }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm ">
-                                <flux:button class="mr-2" icon="pencil-square" size="sm" class="size-4"/>
+                                <flux:modal.trigger :name="'update-admin'.$admin->id" wire:click="editAdmin({{ $admin->id }})">
+                                    <flux:button class="mr-2" icon="pencil-square" size="sm" />
+                                </flux:modal.trigger>
+
+                                <flux:modal.trigger :name="'delete-admin'.$admin->id">
                                 <flux:button variant="danger" icon="trash" size="sm" class="size-4"/>
+                                </flux:modal.trigger>
                             </td>
                         </tr>
+                                <flux:modal :name="'delete-admin'.$admin->id" class="md:w-96">
+                                    <div class="space-y-6">
+                                            <div>
+                                                <flux:heading size="lg">Are you sure to delete this {{ $admin->name }}?</flux:heading>
+                                                <flux:text class="mt-2">This action can't be undone</flux:text>
+                                            </div>
+
+                                            <div class="flex">
+                                                <flux:spacer />
+                                                <flux:button type="cancel" variant="primary">Cancel</flux:button>
+                                                <flux:button type="delete" variant="danger" wire:click="removeAdmin({{ $admin->id }})">Delete</flux:button>
+                                            </div>
+                                    </div>
+                                </flux:modal>
+
+                                <flux:modal :name="'update-admin'.$admin->id" class="min-w-sm">
+                                    <form wire:submit.prevent="updateAdmin({{$admin->id}})">
+                                        <div class="space-y-6">
+                                                <div>
+                                                    <flux:heading size="lg"> Edit admin</flux:heading>
+                                                    <flux:text class="mt-2">Edit admin acc</flux:text>
+                                                </div>
+                                                <flux:input label="Name"  wire:model.defer="updateName" placeholder="e.g. Juan Carlo" />
+                                                <flux:input label="Email" wire:model.defer="updateEmail" placeholder="e.g. juan@gmail.com" />
+                                                
+                                                <div class="flex">
+                                                    <flux:spacer />
+                                                    <flux:button type="submit" variant="primary">Update</flux:button>
+                                                </div>
+                                        </div>
+                                    </form>
+                            </flux:modal>
                     @endforeach
                 </tbody>
             </table>
         </div>
-    </div>
+        <!-- add admin modal -->
+        <flux:modal name="add-admin" class="md:w-96">
+            <form wire:submit.prevent="createAdmin">
+                <div class="space-y-6">
+                    <div>
+                        <flux:heading size="lg">Create new admin</flux:heading>
+                        <flux:text class="mt-2">Make another admin acc</flux:text>
+                    </div>
+                    <flux:input label="Name" wire:model.defer="name" placeholder="e.g. Juan Carlo" />
+                    <flux:input label="Email" wire:model.defer="email" placeholder="e.g. juan@gmail.com" />
+                    <flux:input label="Password" wire:model="password" placeholder="Password" />
+                    <div class="flex">
+                        <flux:spacer />
+                        <flux:button type="submit" variant="primary">Create</flux:button>
+                    </div>
+                </div>
+            </form>
+       </flux:modal>
 
+       <!-- edit admin modal -->
+
+
+       <!-- admin acc delete modal -->
+
+
+    </div>
 </div>

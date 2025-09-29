@@ -1,0 +1,483 @@
+<?php
+
+namespace App\Livewire;
+
+use App\Models\Request;
+use Livewire\Component;
+use Smalot\PdfParser\Parser;
+use Masmerise\Toaster\Toaster;
+use Barryvdh\DomPDF\Facade\Pdf;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+
+class Inbox extends Component
+{
+    public $requests;
+
+    public function mount()
+    {
+        $this->fetchRequest();
+    }
+
+
+
+public function approveRequest($id)
+{
+    Log::info("Fetching request ID: $id");
+
+    set_time_limit(3000);
+    $request = Request::find($id);
+
+    if (!$request) {
+        Log::warning("Request ID $id not found");
+        return response()->json(['error' => 'Request not found'], 404);
+    }
+
+    // 1️⃣ Approve the request
+    $request->status = 'approved';
+    $request->save();
+    Log::info("Request ID $id approved successfully");
+
+    // 2️⃣ Parse authors
+    $authors = json_decode($request->researchProject->author, true);
+    $Publishyear = $request->researchProject->year;
+    $filePath = $request->researchProject->file;
+
+    // 3️⃣ Parse the PDF
+    $pdfFilePath = storage_path('app/public/' . $filePath);
+
+    $parser = new Parser();
+    $pdf = $parser->parseFile($pdfFilePath);
+    $pages = $pdf->getPages();
+    Log::info("PDF file parsed: $filePath, total pages: " . count($pages));
+
+    $headerFooterPattern = '/(List of Tables|List of Figures|DEDICATION)/i';
+    $combined_content = '';
+
+    foreach ($pages as $page) {
+        $pageText = $page->getText();
+        $cleanPageText = preg_replace($headerFooterPattern, '', $pageText);
+        $combined_content .= $cleanPageText;
+    }
+
+    // 4️⃣ Additional cleaning patterns
+    $patterns = [
+        '/\bAppendix\s:?.*?(?=ABSTRACT\s:?)/is',
+        '/\bTable of Contents\s:?.*?(?=ABSTRACT\s:?)/is',
+        '/\bTABLE OF CONTENT\s:?.*?(?=ABSTRACT\s:?)/is',
+        '/\bABSTRACT\s:?.*?(?=ABSTRACT\s:?)/is',
+        '/\bSlovin’s Formula;\s:?.*?(?=Chapter\sIV:?)/is',
+        '/\bChapter\s:?IV.*?(?=System Evaluation Results Based on ISO-25010\s:?)/is',
+        '/\bChapter II\s:?.*?(?=Chapter\sIII:?)/is',
+        '/\bChapter\sV:?.*?(?=REFERENCES\s:?)/is',
+        '/\bScope of Objectives\sV:?.*?(?=Chapter\sIII:?)/is',
+        '/\bAPPENDIX A\s:?.*?(?=APPENDIX P\s:?)/is',
+    ];
+
+    foreach ($patterns as $pattern) {
+        $combined_content = preg_replace($pattern, '', $combined_content);
+    }
+
+    $combined_content = str_replace(["\r", "\n"], '', $combined_content);
+
+    $combined_content = mb_convert_encoding($combined_content, 'UTF-8', 'UTF-8');
+    
+    Log::info("Combined content length: " . mb_strlen($combined_content, 'UTF-8'));
+    // dd($combined_content);
+
+    $chunkSize = 3500;
+    $chunks = [];
+    $length = mb_strlen($combined_content, 'UTF-8');
+    $acmData = [];
+
+    for ($i = 0; $i < $length; $i += $chunkSize) {
+        $chunks[] = mb_substr($combined_content, $i, $chunkSize, 'UTF-8');
+    }
+
+    $token = config('services.github_models.token');
+
+    $client = Http::withToken($token)
+        ->withHeaders([
+            'Accept' => 'application/vnd.github+json',
+            'X-GitHub-Api-Version' => '2022-11-28',
+            'Content-Type' => 'application/json',
+        ]);
+
+    $acmDataTemp = '';
+    $TitleToAuthors = ''; // plain string
+    $AbstractadnIntroduction = ''; // plain string
+
+    $merged = $this->processChunk($client, $combined_content, $chunkSize);
+
+    // dd($merged);
+
+  
+    foreach($chunks as $index => $chunk){
+         Log::info("Sending chunk $index to API, chunk length: " . mb_strlen($chunk, 'UTF-8'));
+        sleep(8);
+$prompt = <<<PROMPT
+Instructions (Shortened):
+
+Extract only readable text. Ignore formulas, equations, code, or non-text.
+Return fields exactly as listed. Missing = empty.
+If section not found → return empty string.
+Do not read or include URLs, links, or any non-text content.
+Do not read or include table of contents or any other non-text content.
+If the text has APPENDIX A-Z, ignore it.
+
+Fields:
+
+title
+abstract
+keywords (comma-separated)
+introduction (≤2 paragraphs)
+methodology (≤2 paragraphs)
+purposeOfDescription (≤3 paragraphs)
+methodologyDesign (≤3 paragraphs)
+references (≤20, preserve format/order)
+
+table (only "ISO-25010 Evaluation Overall" table, full rows/columns, keep original headers/values)
+Skip subtables.
+Return plain text only (no JSON).
+Keep concise, only best/relevant content.
+
+$chunk
+PROMPT;
+while (true) {
+    try {
+        $response = $client->timeout(300)->post(
+            'https://models.github.ai/inference/chat/completions',
+            [
+                'model' => 'openai/gpt-4.1-nano',
+                'messages' => [['role' => 'user', 'content' => $prompt]],
+                'temperature' => 1.0,
+                'top_p' => 1.0,
+            ]
+        );
+    } catch (\Illuminate\Http\Client\ConnectionException $e) {
+        \Log::error("API connection error for chunk {$index}: " . $e->getMessage());
+        Toaster::error('Connection timeout. Please try again later.');
+        return;
+    }
+
+    if ($response->successful()) {
+        break; // ✅ exit retry loop
+    }
+
+    $status = $response->status();
+    $body   = $response->body();
+
+    // handle rate limit
+    if ($status == 429 && str_contains($body, 'RateLimitReached')) {
+        $wait = 60;
+        if (preg_match('/wait (\d+) seconds/i', $body, $m)) {
+            $wait = (int) $m[1];
+        }
+        \Log::warning("Rate limit hit on chunk {$index}. Waiting {$wait}s before retry.");
+        sleep($wait);
+        continue; // 🔁 retry same chunk
+    }
+
+    // other errors → log + abort this chunk
+    \Log::error("API request failed for chunk {$index}: Status {$status}, Body: {$body}");
+    Toaster::error("API request failed for chunk {$index}. Check logs.");
+    return;
+}
+
+    $content = $response->json()['choices'][0]['message']['content'] ?? '';
+    $content = preg_replace('/```json|```/i', '', $content);
+    $content = trim($content);
+
+
+        if($index === 0){
+            $TitleToAuthors = $content; // raw plain text
+        }
+        if ($index === 1) {
+            $AbstractadnIntroduction = $content; // raw plain text
+        }
+
+        $acmDataTemp .= $content;
+        sleep(10);
+    }
+
+    dd($acmDataTemp);
+
+    // $acmDataTemp = str_replace(["\r", "\n"], '', $combined_content);
+    $acmDataTemp = str_replace(["\r", "\n"], '', $acmDataTemp);
+    $acmDataTemp = str_replace('/', '', $acmDataTemp);
+    $acmDataTemp = str_replace('|', '', $acmDataTemp);
+    $acmDataTemp = str_replace('------------------------', '', $acmDataTemp);
+    $acmDataTemp = mb_convert_encoding($acmDataTemp, 'UTF-8', 'UTF-8');
+    $maxLength = 15000;
+    sleep(25);
+    while (mb_strlen($acmDataTemp, 'UTF-8') > $maxLength) {
+        sleep(5);
+        $reChunk = $acmDataTemp;
+        $acmDataTemp = '';
+
+        $length = mb_strlen($reChunk, 'UTF-8');
+        $reChunks = [];
+
+        for ($i = 0; $i < $length; $i += $chunkSize) {
+            $reChunks[] = mb_substr($reChunk, $i, $chunkSize, 'UTF-8');
+        }
+
+        foreach($reChunks as $chunk){
+            sleep(8);;
+            $prompt = <<<PROMPT
+Instructions (Shortened):
+
+Extract only readable text. Ignore formulas, equations, code, or non-text.
+Return fields exactly as listed. Missing = empty.
+If section not found → return empty string.
+Do not read or include URLs, links, or any non-text content.
+Do not read or include table of contents or any other non-text content.
+If the text has APPENDIX A-Z, ignore it.
+
+Fields:
+
+title
+abstract
+keywords (comma-separated)
+introduction (≤2 paragraphs)
+methodology (≤2 paragraphs)
+purposeOfDescription (≤3 paragraphs)
+methodologyDesign (≤3 paragraphs)
+references (≤20, preserve format/order)
+
+table (only "ISO-25010 Evaluation Overall" table, full rows/columns, keep original headers/values)
+Skip subtables.
+Return plain text only (no JSON).
+Keep concise, only best/relevant content.
+
+$chunk
+PROMPT;
+try {
+             $response = $client->timeout(300)
+                    ->post('https://models.github.ai/inference/chat/completions', [
+                    'model' => 'openai/gpt-4.1-nano', 
+                    'messages' => [
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                    'temperature' => 1.0,
+                    'top_p' => 1.0,
+                ]);
+
+                if ($response->failed()) {
+            $status = $response->status();
+            $body = $response->body();
+
+            \Log::error("API request failed for chunk {$index}: Status {$status}, Body: {$body}");
+
+            if ($status == 429 && str_contains($body, 'RateLimitReached')) {
+                Toaster::error('Rate limit reached. You can try again tomorrow.');
+            } else {
+                Toaster::error("API request failed for chunk {$index}. Check logs.");
+            }
+
+            continue; // skip to next chunk
+        }
+
+            $content = $response->json()['choices'][0]['message']['content'] ?? '';
+            $content = preg_replace('/```json|```/i', '', $content);
+            $content = trim($content);
+
+             $acmDataTemp .= $content;
+
+             
+             } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                \Log::error("API connection error for chunk {$index}: " . $e->getMessage());
+                Toaster::error('Connection timeout. Please try again later.');
+                return;
+            }
+        }
+
+        
+    }
+    // dd($merged);
+    $acmData = $this->processChunk($client, $acmDataTemp);
+
+    dd($acmData);
+    // $pdf = Pdf::loadView('pdf.acm-template', compact('acmData', 'authors'));
+
+    // // Download PDF
+    // return $pdf->download('sample_acm.pdf');
+}
+
+private function processChunk($client, $text,  $chunkSize)
+{
+    $text = str_replace(['/', '|', "\r", "\n"], '', $text);
+
+            $length = mb_strlen($text, 'UTF-8');
+            $chunks = [];
+
+            // Split into chunks
+            for ($i = 0; $i < $length; $i += $chunkSize) {
+                $chunks[] = mb_substr($text, $i, $chunkSize, 'UTF-8');
+            }
+
+            $merged = [
+                'title' => '',
+                'abstract' => '',
+                'introduction' => '',
+                'purposeOfDescription' => '',
+                'methodology' => '',
+                'methodologyDesign' => '',
+                'acknowledgement' => '',
+                'references' => [],
+                'table' => [],
+                'year' => '',
+                'keywords' => ''
+            ];
+            
+            sleep(25);
+            foreach ($chunks as $index => $chunk) {
+
+                // dd($chunk);
+$prompt = <<<PROMPT
+You are an ACM-format metadata extraction assistant. Extract metadata from the given PDF text and return strictly valid JSON.
+
+Instructions:
+1. Do not read or include formulas, equations, source code, or any other non-text content.
+2. Authors must only be the authors of the paper (listed at the start, under the title). Do not include any authors from the References section.
+3. Extract the following fields exactly as specified. Missing fields must be empty strings or empty arrays.
+   - title: The title of the paper.
+   - year: The year of publication.
+   - abstract: summarize the abstract.
+   - keywords: Extract exactly as listed under "Keywords: …", return as a comma-separated list.
+   - introduction: Up to two paragraphs summarizing background, context, objectives, importance, scope, and contribution.
+   - methodology: Up to two paragraphs describing the approach, rationale, and main steps.
+   - purposeOfDescription: Up to three paragraphs summarizing goals, objectives, intended outcomes, and problems addressed.
+   - methodologyDesign: Up to three paragraphs explaining the system development methodology, each phase clearly and concisely.
+   - acknowledgement: Extract the acknowledgement section summarize in two paragraph.
+   - references: Copy up to 20 cited references in the text, preserving format and order.
+   - table: Extract only the "ISO-25010 Evaluation Overall" table. Include as JSON with "title", "columns", and "rows" (keys as column headers). Ensure all rows and columns are included.
+    note: do not include sub table, only the main table or the table that has overall in title
+Do not include any extra information, commentary, or explanation. Return strictly valid JSON in the following format:
+Do not include non-readable content like equations, source code, or any other non-text content.
+{
+  "title": "",
+  "year": "",
+  "abstract": "",
+  "keywords": "",
+  "introduction": "",
+  "methodology": "",
+  "purposeOfDescription": "",
+  "methodologyDesign": "",
+  "acknowledgement": "",
+  "references": [],
+  "table": {
+    "title": "ISO-25010 Evaluation Overall",
+    "columns": [],
+    "rows": []
+  }
+}
+
+Always return "table" in this JSON structure:
+
+{
+  "title": "ISO-25010 Evaluation Overall",
+  "columns": ["ISO 25010 Standard", "Mean", "Interpretation"],
+  "rows": [
+    { "ISO 25010 Standard": "<criterion>", "Mean": "<numeric score>", "Interpretation": "<text>" }
+  ]
+}
+
+
+The response must be only the JSON object, with no introductory text or explanations.
+Provide the output as a valid JSON object.
+avoid this kind of error "Initial JSON parse failed: SyntaxError: Expected ',' or '}' after property value in JSON "
+
+**Here is the text to extract from:**  
+
+$chunk
+PROMPT;
+try {
+    $response = $client->timeout(300)
+                    ->post('https://models.github.ai/inference/chat/completions', [
+                    'model' => 'openai/gpt-4.1-nano', 
+                    'messages' => [
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                    'temperature' => 1.0,
+                    'top_p' => 1.0,
+                ]);
+
+                if ($response->failed()) {
+                    $status = $response->status();
+                    $body = $response->body();
+
+                    // Log the error
+                    \Log::error("API request failed for chunk {$index}: Status {$status}, Body: {$body}");
+
+                    // Detect rate limit specifically
+                    if ($status == 429 && str_contains($body, 'RateLimitReached')) {
+                        Toaster::error('Rate limit reached. You can try again tomorrow.');
+                    } else {
+                        Toaster::error('API request failed. Check logs for details.');
+                    }
+
+                    // Stop further execution
+                    return;
+                }
+
+                } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                    \Log::error("API connection error for chunk {$index}: " . $e->getMessage());
+                    Toaster::error('Connection timeout. Please try again later.');
+                    return;
+                }
+
+                $content = $response->json()['choices'][0]['message']['content'] ?? '';
+                $content = preg_replace('/```json|```/i', '', $content);
+                $content = trim($content);
+                Log::info("Received API response for chunk $index, length: " . strlen($content));
+                try {
+                    $Data = json_decode($content, true, 512, JSON_THROW_ON_ERROR);
+                } catch (\JsonException $e) {
+                    error_log('JSON parse error: ' . $e->getMessage());
+                    continue; // Skip invalid response
+                }
+
+                if (!$Data || !is_array($Data)) {
+                continue; // Skip invalid response
+                }
+
+                foreach ($Data as $key => $value) {
+                if ($key === 'references' && is_array($value)) {
+                    $merged['references'] = array_merge($merged['references'], $value);
+                } else if ($key === 'table' && is_array($value)) {
+                    if (empty($merged['table'])) {
+                        $merged['table'] = $value;
+                    }
+                } else {
+                    $merged[$key] = trim($merged[$key] . ' ' . $value);
+                }
+                }
+            }
+        return $merged;
+
+    }
+
+
+
+    public function rejectRequest($id)
+    {
+        $request = Request::find($id);
+        if ($request) {
+            $request->delete();
+            $this->fetchRequest();
+            Toaster::success('Request Rejected');
+        }
+    }
+
+    public function fetchRequest()
+    {
+        $this->requests = Request::all();
+    }
+
+    public function render()
+    {
+        return view('livewire.inbox');
+    }
+}

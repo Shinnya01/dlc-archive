@@ -38,14 +38,49 @@
                                 {{ $user->email }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-right text-sm ">
+
+                            <flux:modal.trigger name="edit-user">
                                 <flux:button class="mr-2" icon="pencil-square" size="sm" class="size-4"/>
+                            </flux:modal.trigger>    
+                             <flux:modal.trigger name="delete-user">
                                 <flux:button variant="danger" icon="trash" size="sm" class="size-4"/>
+                            </flux:modal.trigger>   
                             </td>
                         </tr>
                     @endforeach
                 </tbody>
             </table>
         </div>
-    </div>
+      <!-- update user modal -->
+                <flux:modal name="edit-user" class="md:w-96">
+            <div class="space-y-6">
+                <div>
+                    <flux:heading size="lg">Update user</flux:heading>
+                    <flux:text class="mt-2">Update user datails</flux:text>
+                </div>
+                <flux:input label="Name" placeholder="Name" />
+                <flux:input label="Student Number" placeholder="Student number" />
+                <flux:input label="Email" placeholder="Email" />
+                <div class="flex">
+                    <flux:spacer />
+                    <flux:button type="submit" variant="primary">Save changes</flux:button>
+                </div>
+            </div>
+        </flux:modal>
 
+        <!-- delete user moda -->
+           <flux:modal name="delete-user" class="md:w-96">
+            <div class="space-y-6">
+                <div>
+                    <flux:heading size="lg">Are you sure to delete this user?</flux:heading>
+                    <flux:text class="mt-2">This action can't be undone</flux:text>
+                </div>
+                <div class="flex">
+                    <flux:spacer />
+                    <flux:button type="submit" variant="primary">Cancel</flux:button>
+                    <flux:button type="submit" variant="danger">Delete</flux:button>
+                </div>
+            </div>
+        </flux:modal>
+    </div>
 </div>
