@@ -17,7 +17,7 @@ return new class extends Migration
             $table->foreignId('research_project_id')->constrained()->onDelete('cascade');
             $table->text('purpose');
             $table->string('pdf_path')->nullable();
-            $table->string('status')->default('pending'); // e.g., pending, approved
+            $table->enum('status', ['pending','approved','deleted'])->default('pending'); 
             $table->timestamps();
         });
     }

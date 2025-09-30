@@ -2,6 +2,9 @@
     {{-- To attain knowledge, add things every day; To attain wisdom, subtract things every day. --}}
     <div class="flex items-center justify-between">
         <h1 class="text-4xl font-bold text-red-900">My ACM Requests</h1>
+        <flux:modal.trigger name="archive">
+            <flux:button>Archive</flux:button>
+        </flux:modal.trigger>
         <div class="flex justify-end w-lg">
         </div>
     </div>
@@ -42,7 +45,7 @@
                                     <flux:button variant="danger" icon="x-mark" size="sm" >Cancel</flux:button>
                                 @else
                                     <flux:button class="mr-2" icon="folder-arrow-down" size="sm" href="{{ asset(str_replace('public/', 'storage/', $request->pdf_path)) }}" target="_blank">Download</flux:button>
-                                    <flux:button variant="danger" icon="x-mark" size="sm" >Delete</flux:button>
+                                    <flux:button variant="danger" icon="x-mark" size="sm" wire:click="deleteRequest({{ $request->id }})">Delete</flux:button>
                                 @endif
                             </td>
                         </tr>                 
@@ -52,6 +55,46 @@
         </div>
     </div>
 
+    <flux:modal name="archive">
+        <flux:heading>Archive</flux:heading>
+       <table class="min-w-full divide-y divide-gray-200">
+                <thead class="bg-amber-100">
+                    <tr class="">
+                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                            Title
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                            Request Purpose
+                        </th>
+                        <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
+                            Request Purpose
+                        </th>
+                        <th class="px-6 py-3 text-right text-sm font-bold text-gray-700 uppercase tracking-wider">
+                            Actions
+                        </th>
+                    </tr>
+                </thead>
+                <tbody class="bg-white divide-y divide-gray-200">
+                    @foreach ($archives as $archive)
+                        <tr>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                {{ $archive->researchProject->title }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                {{ $archive->purpose }}
+                            </td>
+                            <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
+                                {{ $archive->status }}
+                            </td>
+     
+                            <td class="px-6 py-4 whitespace-nowrap text-right text-sm ">
+                                <flux:button variant="danger" icon="x-mark" size="sm" wire:click="restoreRequest({{ $archive->id }})">Restore</flux:button>
+                            </td>
+                        </tr>                 
+                    @endforeach
+                </tbody>
+            </table>
+    </flux:modal>
 
 </div>
 
