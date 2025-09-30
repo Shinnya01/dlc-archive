@@ -68,14 +68,7 @@
                             </div>
                         </div>
                     </flux:modal>
-
-
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
-                            <!-- update user modal -->
+                             <!-- update user modal -->
                     <flux:modal :name="'edit-user'.$user->id" class="md:w-96">
                         <div class="space-y-6">
                         @if ($selectedUser && $selectedUser->id === $user->id)
@@ -107,6 +100,13 @@
                         @endif
                         </div>
                     </flux:modal>
+
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+                   
         <!-- delete user moda -->
           
     </div>
