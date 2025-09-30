@@ -121,7 +121,7 @@
     </div>
 
     <!-- create project -->
-    <flux:modal name="create-project" class="md:w-96">
+    <flux:modal name="create-project" class="md:w-96" :dismissible="false">
         <form wire:submit.prevent="createProject" enctype="multipart/form-data">
             <div class="space-y-6">
                 <div>

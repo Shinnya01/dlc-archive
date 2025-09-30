@@ -63,8 +63,17 @@
                             </div>
                             <div class="flex">
                                 <flux:spacer />
-                                <flux:button type="submit" variant="primary">Cancel</flux:button>
-                                <flux:button type="submit" variant="danger" wire:click="removeUser({{ $user->id }})">Delete</flux:button>
+                                <flux:modal.close>
+                                    <flux:button type="submit" variant="primary">Cancel</flux:button>
+                                </flux:modal.close>
+                                <flux:button 
+                                    type="submit" 
+                                    variant="danger" 
+                                    wire:click="removeUser({{ $user->id }})" 
+                                    wire:loading.attr="disabled">
+                                    <span wire:loading.remove>Delete</span>
+                                    <span wire:loading>Deleting...</span>
+                                </flux:button>
                             </div>
                         </div>
                     </flux:modal>
