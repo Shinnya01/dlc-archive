@@ -81,6 +81,20 @@ class ManageProjects extends Component
         $authorsJson  = $this->generateAuthor($authorUrl);
         $keywordsJson = $this->generateKeyword($projectUrl);
 
+        if ($authorsJson === 'used_all_token' || $keywordsJson === 'used_all_token') {
+            Toaster::error('AI token limit reached. Please try again later.');
+            $this->modal('create-project')->close();
+            $this->reset(['title','year','authorFile','projectFile']);
+            return; 
+        }
+        if ($authorsJson === 'ai_request_failed' || $keywordsJson === 'ai_request_failed') {
+            Toaster::error('AI request failed. Please try again later.');
+            $this->modal('create-project')->close();
+            $this->reset(['title','year','authorFile','projectFile']);
+            return; 
+        }
+        
+
         // 4. Save to DB
         ResearchProject::create([
             'title'       => $this->title,
@@ -144,6 +158,17 @@ class ManageProjects extends Component
                         ['role' => 'user', 'content' => $prompt],
                     ],
                 ]);
+            if ($response->failed()) {
+                // Token or rate limit reached
+                if ($response->status() == 429 || str_contains($response->body(), 'RateLimitReached')) {
+                    // Toaster::error('AI token limit reached. Please try again later.');
+                    return 'used_all_token';
+                } else {
+                    // Toaster::error('AI request failed. Check logs for details.');
+                    return 'ai_request_failed';
+                }
+                return $authorsJson;
+            }
 
             if ($response->successful()) {
                 $content = $response->json()['choices'][0]['message']['content'] ?? '';
@@ -216,6 +241,19 @@ class ManageProjects extends Component
                         ['role' => 'user', 'content' => $prompt],
                     ],
                 ]);
+
+             if ($response->failed()) {
+                // Token or rate limit reached
+                if ($response->status() == 429 || str_contains($response->body(), 'RateLimitReached')) {
+                    // Toaster::error('AI token limit reached. Please try again later.');
+                    return 'used_all_token';
+                } else {
+                    // Toaster::error('AI request failed. Check logs for details.');
+                    return 'ai_request_failed';
+                }
+
+                return $keywordsJson;
+            }
 
             if ($response->successful()) {
                 $content = $response->json()['choices'][0]['message']['content'] ?? '';

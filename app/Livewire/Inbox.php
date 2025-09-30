@@ -37,102 +37,85 @@ class Inbox extends Component
 
         // ✅ Extract metadata
         $authors = json_decode($request->researchProject->author, true);
-        $publishYear = $request->researchProject->year;
-        $filePath = storage_path('app/public/' . $request->researchProject->file);
 
-        $combinedContent = $this->parsePdf($filePath);
-        Log::info("Combined content length: " . mb_strlen($combinedContent, 'UTF-8'));
+        // Download the PDF from Spaces to a temporary local file
+        $remoteUrl = Storage::disk('spaces')->url($request->researchProject->file);
+        $tempPath = tempnam(sys_get_temp_dir(), 'pdf_');
+        file_put_contents($tempPath, file_get_contents($remoteUrl));
+
+        // Parse the PDF
+        $combinedContent = $this->parsePdf($tempPath);
+
+        // Delete the temp file after parsing
+        @unlink($tempPath);
 
         $chunks = $this->splitText($combinedContent);
 
         $client = $this->githubClient();
         $acmDataTemp = $this->processPlainChunks($client, $chunks);
 
-        // further post-processing
         $acmDataTemp = $this->cleanText($acmDataTemp);
-
-        // final extraction to JSON structure
         $acmData = $this->processChunk($client, $acmDataTemp, $this->chunkSize);
 
         
-        if($acmData){
-
+        if ($acmData) {
             $pdf = new \TCPDF('P', 'mm', 'A4', true, 'UTF-8', false);
 
             $pdf->setPrintHeader(false);
             $pdf->setPrintFooter(false);
-
             $pdf->SetTitle($acmData['title'] ?? '');
             $pdf->SetMargins(15, 10, 15);
             $pdf->SetAutoPageBreak(true, 15);
             $pdf->AddPage();
 
-            // --- TITLE & AUTHORS (centered, full width) ---
+            // --- TITLE ---
             $pdf->SetFont('times', 'B', 14);
             $pageWidth = $pdf->getPageWidth() - $pdf->getMargins()['left'] - $pdf->getMargins()['right'];
             $pdf->MultiCell($pageWidth, 7, $acmData['title'] ?? '', 0, 'C', false, 1);
 
+            // --- AUTHORS ---
             $pdf->SetFont('times', '', 10);
-
-            // Number of authors
-            $numAuthors = !empty($authors) ? count($authors) : 0;
+            $numAuthors = count($authors ?? []);
             if ($numAuthors > 0) {
-                // Calculate width for each author block
                 $authorWidth = $pageWidth / $numAuthors;
-
-                // Save current Y position
                 $yStart = $pdf->GetY();
 
-                foreach ($authors as $index => $author) {
-                    // Build author text safely
+                foreach ($authors as $i => $author) {
                     $authorText = ($author['name'] ?? '') . "\n";
                     $authorText .= ($author['program'] ?? '') . ', ' . ($author['university'] ?? '') . "\n";
-                    // Example address & contact
                     $authorText .= ($author['address'] ?? "123 Academic Lane, Lubao,\nPampanga") . "\n";
                     $authorText .= ($author['phone'] ?? '+63 912 345 6789') . "\n";
                     $authorText .= ($author['email'] ?? '');
-
-                    // X position: left margin + index * authorWidth
-                    $xPos = $pdf->getMargins()['left'] + $index * $authorWidth;
-
-                    $pdf->SetXY($xPos, $yStart);
-                    $pdf->MultiCell($authorWidth, 5, $authorText, 0, 'C', false, 0); // 0 = continue on same line
+                    $pdf->SetXY($pdf->getMargins()['left'] + $i * $authorWidth, $yStart);
+                    $pdf->MultiCell($authorWidth, 5, $authorText, 0, 'C', false, 0);
                 }
                 $pdf->Ln(40);
             }
 
-            // --- ENABLE 2 COLUMNS ---
-            $gap = 5; // mm
+            // --- 2-COLUMNS for main content ---
+            $gap = 5;
             $columnWidth = ($pageWidth - $gap) / 2;
             $pdf->setEqualColumns(2, $columnWidth);
             $pdf->selectColumn(0);
 
-            // --- ABSTRACT ---
-            if (!empty($acmData['abstract'])) {
-                $pdf->SetFont('times', 'B', 11);
-                $pdf->Cell(0, 6, 'ABSTRACT', 0, 1);
-                $pdf->SetFont('times', '', 10);
-                $pdf->MultiCell(0, 5, $acmData['abstract']);
-                $pdf->Ln(2);
+            // --- ABSTRACT & KEYWORDS ---
+            foreach (['abstract' => 'ABSTRACT', 'keywords' => 'KEYWORDS'] as $field => $label) {
+                if (!empty($acmData[$field])) {
+                    $pdf->SetFont('times', 'B', 11);
+                    $pdf->Cell(0, 6, $label, 0, 1);
+                    $pdf->SetFont('times', '', 10);
+                    $pdf->MultiCell(0, 5, $acmData[$field]);
+                    $pdf->Ln(2);
+                }
             }
 
-            // --- KEYWORDS ---
-            if (!empty($acmData['keywords'])) {
-                $pdf->SetFont('times', 'B', 11);
-                $pdf->Cell(0, 6, 'KEYWORDS', 0, 1);
-                $pdf->SetFont('times', '', 10);
-                $pdf->MultiCell(0, 5, $acmData['keywords']);
-                $pdf->Ln(5);
-            }
-
-            // --- SECTIONS ---
+            // --- MAIN SECTIONS ---
             $sections = [
                 'INTRODUCTION' => $acmData['introduction'] ?? '',
                 'PURPOSE OF DESCRIPTION' => $acmData['purposeOfDescription'] ?? '',
                 'METHODOLOGY' => $acmData['methodology'] ?? '',
                 'METHODOLOGY DESIGN' => $acmData['methodologyDesign'] ?? ''
             ];
-
             foreach ($sections as $title => $content) {
                 if (trim($content) !== '') {
                     $pdf->SetFont('times', 'B', 11);
@@ -143,32 +126,44 @@ class Inbox extends Component
                 }
             }
 
-            // --- EVALUATION TABLE ---
+            // --- EVALUATION RESULTS (ISO-25010) ---
             if (!empty($acmData['table']['columns']) && !empty($acmData['table']['rows'])) {
-                $pdf->Ln(2);
+                $pdf->Ln(3);
                 $pdf->SetFont('times', 'B', 11);
-                $pdf->Cell(0, 6, 'EVALUATION RESULTS', 0, 1);
+                $pdf->Cell(0, 6, 'EVALUATION RESULTS (ISO-25010)', 0, 1);
                 $pdf->SetFont('times', '', 10);
 
+                // Start HTML table
                 $tbl = '<table border="1" cellpadding="3" cellspacing="0">';
                 $tbl .= '<tr style="background-color:#eeeeee;">';
                 foreach ($acmData['table']['columns'] as $col) {
-                    $tbl .= '<th><b>'.htmlspecialchars($col).'</b></th>';
+                    $tbl .= '<th><b>' . htmlspecialchars($col) . '</b></th>';
                 }
                 $tbl .= '</tr>';
 
+                // TCPDF can auto-split tables if you use writeHTML with true for $ln and $reseth
                 foreach ($acmData['table']['rows'] as $row) {
                     $tbl .= '<tr>';
-                    foreach ($row as $cell) {
-                        $tbl .= '<td>'.htmlspecialchars($cell).'</td>';
+                    foreach ($acmData['table']['columns'] as $colKey) {
+                        $tbl .= '<td>' . htmlspecialchars($row[$colKey] ?? '') . '</td>';
                     }
                     $tbl .= '</tr>';
                 }
                 $tbl .= '</table>';
 
+                // Use MultiCell height to estimate if table will fit, add page if needed
+                $estimatedHeight = count($acmData['table']['rows']) * 6 + 20; // 6mm per row approx
+                if ($pdf->GetY() + $estimatedHeight > $pdf->getPageHeight() - $pdf->getMargins()['bottom']) {
+                    $pdf->AddPage();
+                    $pdf->selectColumn(0); // reset to first column
+                }
+
+                // Write the table
                 $pdf->writeHTML($tbl, true, false, false, false, '');
-                $pdf->Ln(3);
+                $pdf->Ln(5);
             }
+
+
 
             // --- ACKNOWLEDGEMENT ---
             if (!empty($acmData['acknowledgement'])) {
@@ -180,47 +175,35 @@ class Inbox extends Component
             }
 
             // --- REFERENCES ---
+           // --- REFERENCES in ACM style ---
             if (!empty($acmData['references'])) {
+                // Keep only bibliographic entries, remove evaluation/data rows
+                $refs = array_filter($acmData['references'], function($r) {
+                    return !preg_match('/(Functionality|Usability|Reliability|Security|Portability|Maintainability|ISO-25010)/i', $r);
+                });
 
-                // Step 1: Remove empty, URL, or duplicate entries
-                $validReferences = array_filter($acmData['references'], function($ref) {
+                $refs = array_values($refs); // reindex
+                $refsText = '';
+                foreach ($refs as $i => $ref) {
                     $ref = trim($ref);
-                    return !empty($ref) && preg_match('/[A-Za-z0-9]/', $ref) && !preg_match('#^https?://#i', $ref);
-                });
-                $validReferences = array_unique($validReferences);
-
-                // Step 2: Keep only entries that look like real references
-                $validReferences = array_filter($validReferences, function($ref) {
-                    // Keep if contains a 4-digit year (e.g., 2021) OR "Author, ..." pattern
-                    return preg_match('/\d{4}/', $ref) || preg_match('/[A-Z][a-z]+,\s*[A-Z]?/', $ref);
-                });
-
-                // Step 3: Remove existing numbering (e.g., "1. ")
-                $validReferences = array_map(function($ref) {
-                    return preg_replace('/^\s*\d+\.\s*/', '', $ref);
-                }, $validReferences);
-
-                // Step 4: Re-number references consistently
-                $numberedReferences = [];
-                foreach ($validReferences as $i => $ref) {
-                    $numberedReferences[] = ($i + 1) . ". " . $ref;
+                    if ($ref !== '') {
+                        // Add ACM style numbering [1], [2], ...
+                        $refsText .= '[' . ($i + 1) . '] ' . $ref . "\n";
+                    }
                 }
 
-                // Combine all references into one block
-                $refsText = implode("\n", $numberedReferences);
-
-                // PDF output
-                $pdf->SetFont('times', 'B', 11);
-                $pdf->Cell(0, 6, 'REFERENCES', 0, 1);
-                $pdf->SetFont('times', '', 10);
-                $pdf->MultiCell(0, 5, $refsText, 0, 'J');
+                if ($refsText !== '') {
+                    $pdf->SetFont('times', 'B', 11);
+                    $pdf->Cell(0, 6, 'REFERENCES', 0, 1);
+                    $pdf->SetFont('times', '', 10);
+                    $pdf->MultiCell(0, 5, $refsText, 0, 'J');
+                }
             }
 
 
             $filename = 'ACM_' . Str::random(8) . '.pdf';
-            $path = "public/{$filename}"; // will live in storage/app/public
+            $path = "public/{$filename}";
             $fullPath = storage_path("app/{$path}");
-
             $pdf->Output($fullPath, 'F');
 
             $request->pdf_path = $path;
@@ -228,8 +211,9 @@ class Inbox extends Component
             $request->save();
 
             $this->fetchRequest();
-            Toaster::success('Request Approve and ACM Generated Successfully!');
+            Toaster::success('Request approved and ACM PDF generated successfully!');
         }
+
 
         // $request->pdf_path = $path;
         // $request->status = 'approved';

@@ -41,6 +41,7 @@ class AdminAccounts extends Component
         ]);
 
         $this->fetchAdmins();
+        $this->reset(['name','email','password']);
         $this->modal('add-admin')->close();
         Toaster::success('Admin Created Successfully!');
         

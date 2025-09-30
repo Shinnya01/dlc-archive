@@ -130,11 +130,25 @@
                         Create new research project that user can download
                     </flux:text>
                 </div>
+                <div class="grid grid-cols-[1fr_auto] gap-2">
 
+                
                 <flux:input label="Title" placeholder="Title" wire:model="title" />
+                @php
+                    $currentYear = \Carbon\Carbon::now()->year;
+                    $years = range($currentYear, 1900); // descending order
+                @endphp
+                <flux:select label="Year" wire:model="year">
+                    <option value="">Select year</option>
+                    @foreach($years as $year)
+                        <option value="{{ $year }}">{{ $year }}</option>
+                    @endforeach
+                </flux:select>
+                </div>
                 {{-- <flux:input label="Author" placeholder="Author" wire:model="author" /> --}}
-                <flux:input label="Year" placeholder="Year" wire:model="year" />
 
+                {{-- <flux:input label="Year" placeholder="Year" wire:model="year" /> --}}
+                
                 {{-- PDF Upload --}}
                 <flux:input 
                     label="Author File" 
