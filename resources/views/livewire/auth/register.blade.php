@@ -48,7 +48,7 @@ new #[Layout('components.layouts.auth')] class extends Component {
       <img src="{{ asset('logo1.png') }}" alt="Logo 2" class="w-24 h-24 rounded-full" />
        <img src="{{ asset('logo2.png') }}" alt="Logo 2" class="w-24 h-24 rounded-full" />
     </div>
-    <x-auth-header :title="__('Sign Up - Plc Archive')" :description="__('Enter your details below to create your account')" />
+    <x-auth-header :title="__('Sign Up - PlC Archive')" :description="__('Enter your details below to create your account')" />
 
     <!-- Session Status -->
     <x-auth-session-status class="text-center" :status="session('status')" />
