@@ -1,5 +1,5 @@
 <div class="space-y-6">
-
+ 
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
 
@@ -98,6 +98,11 @@ function renderPage(pdf, pageNum, container) {
         canvas.height = scaledViewport.height;
         canvas.style.display = 'block';
         canvas.style.margin = '0 auto 24px auto';
+
+         canvas.oncontextmenu = (e) => e.preventDefault();
+        canvas.ondragstart = (e) => e.preventDefault();
+        canvas.style.userSelect = 'none'; // Disable text selection
+        canvas.style.pointerEvents = 'auto'; // Keep interaction if needed
 
         page.render({ canvasContext: ctx, viewport: scaledViewport }).promise.then(() => {
             // Optional: add watermark

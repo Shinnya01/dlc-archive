@@ -63,15 +63,23 @@ class ManageProjects extends Component
         ]);
 
         // 2. Store PDFs
-        $authorPath  = $this->authorFile->store('projects/authorFile', 'public');
-        $projectPath = $this->projectFile->store('projects', 'public');
+        // $authorPath  = $this->authorFile->store('projects/authorFile', 'public');
+        // $projectPath = $this->projectFile->store('projects', 'public');
 
-        $authorFullPath  = storage_path('app/public/'.$authorPath);
-        $projectFullPath = storage_path('app/public/'.$projectPath);
+        $authorPath  = $this->authorFile->store('projects/authorFile', 'spaces');
+        $projectPath = $this->projectFile->store('projects', 'spaces');
+
+
+        // $authorFullPath  = storage_path('app/public/'.$authorPath);
+        // $projectFullPath = storage_path('app/public/'.$projectPath);
+
+        $authorUrl  = Storage::disk('spaces')->url($authorPath);
+        $projectUrl = Storage::disk('spaces')->url($projectPath);
+
 
         // 3. Generate authors & keywords using helper methods
-        $authorsJson  = $this->generateAuthor($authorFullPath);
-        $keywordsJson = $this->generateKeyword($projectFullPath);
+        $authorsJson  = $this->generateAuthor($authorUrl);
+        $keywordsJson = $this->generateKeyword($projectUrl);
 
         // 4. Save to DB
         ResearchProject::create([
