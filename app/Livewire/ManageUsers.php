@@ -12,12 +12,23 @@ class ManageUsers extends Component
 
     public function mount()
     {
-        $this->fetchUsers();
+       $this->fetchUser();
     }
 
-    public function fetchUsers()
+     public function fetchUser()
     {
-        $this->users = User::where('role', 'user')->get();
+        $this->users = User::where('role', 'user')
+                            ->get();
+    }
+
+    public function removeUser($id)
+    {
+        $removeUser = User::find($id); 
+
+        $removeUser->delete();
+        $this->fetchUser();
+        $this->modal('delete-user'.$id)->close();
+        Toaster::success('User Removed Successfully!');
     }
 
 
