@@ -39,7 +39,7 @@ class ManageUsers extends Component
         $user->status = 'verified';
 
         $user->save();
-        $this->fetchUsers();
+        $this->fetchUser();
         Toaster::success('User Verified Successfully!');
     }
     
