@@ -60,7 +60,7 @@
             <flux:navlist variant="outline">
                 <flux:navlist.group :heading="__('Platform')" class="grid">
 
-                @if(auth()->user()->isAdmin())
+                @if(auth()->check() && auth()->user()->isAdmin())
                     <flux:navlist.item class="{{ request()->routeIs('dashboard') ? '!text-black' : '!text-white' }}" icon="home" :href="route('dashboard')" :current="request()->routeIs('dashboard')" wire:navigate>{{ __('Dashboard') }}</flux:navlist.item>
 
                     <flux:navlist.item class="{{ request()->routeIs('manage-users') ? '!text-black' : '!text-white' }}" icon="users" wire:navigate :href="route('manage-users')" :current="request()->routeIs('manage-users')">{{ __('Manage User') }}</flux:navlist.item>

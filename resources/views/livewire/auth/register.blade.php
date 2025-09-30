@@ -31,11 +31,15 @@ new #[Layout('components.layouts.auth')] class extends Component {
             'student_number' => ['required', 'string', 'max:20', 'unique:' . User::class],
         ]);
 
+        $validated['uid'] = strtoupper(substr(md5(uniqid()), 0, 12));
+
         $validated['password'] = Hash::make($validated['password']);
 
         event(new Registered(($user = User::create($validated))));
 
         Auth::login($user);
+
+        session()->flash('uid', $validated['uid']);
 
         $this->redirectIntended(route('home', absolute: false), navigate: true);
         Mail::to($user->email)->send(new PendingApprovalMail($user->name));

@@ -38,6 +38,14 @@ class User extends Authenticatable
         'remember_token',
     ];
 
+    protected static function booted()
+    {
+    static::creating(function ($user) {
+        $user->uid = strtoupper(Str::random(12)); // random A-Z0-9
+    });
+    }
+
+
     /**
      * Get the attributes that should be cast.
      *

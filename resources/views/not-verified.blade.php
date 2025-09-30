@@ -1,7 +1,9 @@
 <x-layouts.guest>
 <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
     <div class="bg-white shadow-lg rounded-2xl p-10 w-full max-w-md text-center">
-        
+
+
+
         <p class="text-3xl lg:text-7xl font-extrabold text-red-600 mb-8">
             NOT VERIFIED
         </p>
@@ -10,6 +12,17 @@
             Your account has not been verified yet. <br>
             Please wait for admin approval, we'll notify you.
         </p>
+    
+            <div class="flex flex-col justify-start my-5">
+                <flux:label>Your UID</flux:label>
+                <flux:input type="password" icon="key" value="{{ auth()->user()->uid }}" readonly copyable viewable/>
+                <flux:description class="text-xs">Please keep this UID safe. You’ll need it for password recovery.</flux:description>
+            </div>
+            
+            
+            
+            
+
 
         <form method="POST" action="{{ route('logout') }}">
             @csrf

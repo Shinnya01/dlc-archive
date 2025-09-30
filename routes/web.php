@@ -12,7 +12,9 @@ use App\Livewire\AdminAccounts;
 use App\Models\ResearchProject;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Livewire\ManageProjects;
+use App\Livewire\Auth\ResetPassword;
 use Illuminate\Support\Facades\Http;
+use App\Livewire\Auth\ForgotPassword;
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -58,9 +60,12 @@ Route::get('dashboard', function () {
 Route::middleware(['auth'])->group(function () {
     Route::redirect('settings', 'settings/profile');
 
+    
+
     Volt::route('settings/profile', 'settings.profile')->name('profile.edit');
     Volt::route('settings/password', 'settings.password')->name('password.edit');
     Volt::route('settings/appearance', 'settings.appearance')->name('appearance.edit');
+    
 
     Volt::route('settings/two-factor', 'settings.two-factor')
         ->middleware(
