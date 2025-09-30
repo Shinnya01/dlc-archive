@@ -57,13 +57,14 @@ class ManageUsers extends Component
         $user = User::find($id);
         $user->name = $this->updateName;
         $user->email = $this->updateEmail;
+        $user->student_number = $this->updateStudentNumber;
         $user->save();
 
 
         $this->reset(['updateName', 'updateEmail','updateStudentNumber', 'selectedUser']);
 
         $this->fetchUser();
-        $this->modal('update-user'.$id)->close();
+        $this->modal('edit-user'.$id)->close();
         Toaster::success('User Updated Successfully!');
     }
     public function approveUser($id)

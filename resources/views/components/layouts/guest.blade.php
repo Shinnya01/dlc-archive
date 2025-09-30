@@ -5,7 +5,6 @@
     </head>
     <body class="min-h-screen bg-white">
         {{ $slot }}
-        asdkagsdi
 
         @fluxScripts
     </body>

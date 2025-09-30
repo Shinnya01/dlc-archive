@@ -1,3 +1,4 @@
+<x-layouts.guest>
 <div class="flex flex-col items-center justify-center min-h-screen bg-gray-50 p-6">
     <div class="bg-white shadow-lg rounded-2xl p-10 w-full max-w-md text-center">
         
@@ -24,3 +25,4 @@
         </form>
     </div>
 </div>
+</x-layouts.guest>
