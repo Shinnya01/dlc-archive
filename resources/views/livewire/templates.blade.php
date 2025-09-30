@@ -1,4 +1,6 @@
 <div class="space-y-6">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
+
     <div class="flex items-center justify-between">
         <h1 class="text-4xl font-bold text-red-900">Templates</h1>
         <div class="flex justify-end gap-2 w-xl">
@@ -18,8 +20,8 @@
         <div wire:key="{{ $template->id }}">
         
         <flux:modal.trigger :name="'previewFile'.$template->id">
-        <button class="cursor-pointer h-auto w-full bg-white shadpw-xl flex gap-4 items-center p-4 rounded-xl"
-            >
+        <button class="cursor-pointer h-auto w-full bg-white shadow-xl flex gap-4 items-center p-4 rounded-xl"
+            onclick="previewPdf({{ $template->id }}, '{{ Storage::url($template->file) }}')">
             <flux:avatar :name="$template->title" size="sm" circle  class="my-auto size-12 !bg-red-800 !text-white !text-xl"/>
             <div>
                 <h2 class="text-lg text-left font-semibold text-black">{{ $template->title }} </h2>
@@ -50,21 +52,10 @@
 
             <flux:modal :name="'previewFile'.$template->id" class="min-w-[60vw] max-w-5xl space-y-2" wire:model="showModal">
 
-                @php
-                    $filePath = $template->file;
-                    $fileExtension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
-                @endphp
-                <div class="h-[60vh] ">
-                    @if(in_array($fileExtension, ['pdf', 'PDF']))
-                        <object data="{{ Storage::url($filePath) }}" type="application/pdf" class="w-full h-full">
-                            <p>PDF not supported. <a href="{{ Storage::url($filePath) }}" target="_blank">Download</a></p>
-                        </object>
-                    @elseif(in_array($fileExtension, ['png', 'jpg', 'jpeg', 'gif']))
-                        <img src="{{ Storage::url($filePath) }}" alt="Preview" class="w-full h-full object-contain" />
-                    @else
-                        <p>This file type cannot be previewed. <a href="{{ Storage::url($filePath) }}" target="_blank">Download</a></p>
-                    @endif
-                </div>
+               <div class="h-[60vh] overflow-auto" id="pdf-preview-container-{{ $template->id }}">
+    <div id="pdf-scroll-view-{{ $template->id }}"></div>
+</div>
+
                 <flux:textarea placeholder="Enter Purpose of the Request" wire:model="purpose"/>
                 <div class="flex justify-end">
                     <flux:button 
@@ -80,4 +71,49 @@
         </div>
          @endforeach
     </div>
+    <script>
+        function previewPdf(templateId, fileUrl) {
+    const container = document.getElementById(`pdf-scroll-view-${templateId}`);
+    container.innerHTML = '<p style="text-align:center;color:#888;">Loading PDF...</p>';
+
+    pdfjsLib.getDocument(fileUrl).promise.then(pdf => {
+        container.innerHTML = '';
+        for (let pageNum = 1; pageNum <= pdf.numPages; pageNum++) {
+            renderPage(pdf, pageNum, container);
+        }
+    });
+}
+
+function renderPage(pdf, pageNum, container) {
+    pdf.getPage(pageNum).then(page => {
+        const viewport = page.getViewport({ scale: 1 });
+        const scale = Math.min(window.innerWidth * 0.7 / viewport.width, 1.5);
+        const scaledViewport = page.getViewport({ scale });
+
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = scaledViewport.width;
+        canvas.height = scaledViewport.height;
+        canvas.style.display = 'block';
+        canvas.style.margin = '0 auto 24px auto';
+
+        page.render({ canvasContext: ctx, viewport: scaledViewport }).promise.then(() => {
+            // Optional: add watermark
+            const logo = new Image();
+            logo.src = '/images/lubao_logo.png';
+            logo.onload = () => {
+                ctx.save();
+                ctx.globalAlpha = 0.13;
+                const logoWidth = canvas.width * 0.5;
+                const logoHeight = logo.height * (logoWidth / logo.width);
+                ctx.drawImage(logo, (canvas.width - logoWidth) / 2, (canvas.height - logoHeight) / 2, logoWidth, logoHeight);
+                ctx.restore();
+            };
+        });
+
+        container.appendChild(canvas);
+    });
+}
+
+    </script>
 </div>
