@@ -14,10 +14,12 @@
         "laravel/fortify": "^1.30",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
+        "league/flysystem-aws-s3-v3": "3.0",
         "livewire/flux": "^2.1.1",
         "livewire/volt": "^1.7.0",
         "masmerise/livewire-toaster": "^2.8",
         "smalot/pdfparser": "^2.12",
+        "spatie/pdf-to-image": "^1.2",
         "spatie/pdf-to-text": "^1.54",
         "tecnickcom/tcpdf": "^6.10"
     },
