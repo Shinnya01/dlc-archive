@@ -10,6 +10,10 @@ class ManageUsers extends Component
 {
     public $users;
 
+    public $updateName;
+    public $updateStudentNumber;
+    public $updateEmail;
+
     public function mount()
     {
        $this->fetchUser();
@@ -31,8 +35,37 @@ class ManageUsers extends Component
         Toaster::success('User Removed Successfully!');
     }
 
+    public $selectedUser = null;
+    public function editUser($id)
+    {
+        $this->selectedUser = User::find($id);
+        $this->updateName = $this->selectedUser->name;
+        $this->updateEmail = $this->selectedUser->email;
+        $this->updateStudentNumber = $this->selectedUser->student_number;
+
+    }
+
+    public function updateUser($id)
+    {
+        $this->validate([
+            'updateName' => 'required|string|unique:users,name,'.$id.'|max:255',
+            'updateEmail' => 'required|string|email|max:255|unique:users,email,'.$id,
+            'updateStudentNumber' => 'required|string|max:255|unique:users,student_number,'.$id.'|max:10',
+        ]);
 
 
+        $user = User::find($id);
+        $user->name = $this->updateName;
+        $user->email = $this->updateEmail;
+        $user->save();
+
+
+        $this->reset(['updateName', 'updateEmail','updateStudentNumber', 'selectedUser']);
+
+        $this->fetchUser();
+        $this->modal('update-user'.$id)->close();
+        Toaster::success('User Updated Successfully!');
+    }
     public function approveUser($id)
     {
         $user = User::find($id);

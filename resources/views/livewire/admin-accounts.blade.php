@@ -48,7 +48,7 @@
                          <flux:modal :name="'delete-admin' . $admin->id" class="md:w-96">
                                     <div class="space-y-6">
                                         <!-- Header -->
-                                        <d class="text-start">
+                                        <div class="text-start">
                                             <flux:heading size="lg" class="text-red-600">Delete Admin</flux:heading>
                                             <flux:text class="mt-2 text-gray-600">
                                                  Are you sure you want to delete 
@@ -57,14 +57,15 @@
                                             <flux:text class="mt-1 text-sm text-gray-500">
                                                   This action cannot be undone.
                                               </flux:text>
-                                         </d
-                                        <!-- Action Buttons -->
-                                        <br>
+                                            </div>
+                                        {{-- Action Buttons --}}
+                                        
                                         <div class="flex justify-end space-x-3">
-                                  
-                                               <flux:button variant="ghost"  x-on:click="$dispatch('close-modal', { name: 'add-admin' })">
+                                            <flux:modal.close>
+                                            <flux:button variant="ghost" >
                                                 Cancel
                                             </flux:button>
+                                            </flux:modal.close>
                                               <flux:button 
                                                  type="delete" 
                                                    variant="danger" 

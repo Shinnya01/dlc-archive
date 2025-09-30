@@ -47,7 +47,7 @@
                             @if($user->status === 'pending')
                                 <flux:button class="mr-2" icon="check" size="sm" class="!bg-green-500 !text-white" wire:click="approveUser({{ $user->id }})">Verify</flux:button>
                             @endif
-                            <flux:modal.trigger name="edit-user">
+                            <flux:modal.trigger :name="'edit-user'.$user->id" wire:click="editUser({{ $user->id }})">
                                 <flux:button class="mr-2" icon="pencil-square" size="sm" class=""/>
                             </flux:modal.trigger> 
                              <flux:modal.trigger name="delete-user">
@@ -68,26 +68,34 @@
                             </div>
                         </div>
                     </flux:modal>
+
+                    <!-- update user modal -->
+                    <flux:modal :name="'edit-user'.$user->id" class="md:w-96">
+                        @if ($selectedUser && $selectedUser->id === $user->id)
+                            <div class="space-y-6">
+                                <div>
+                                    <flux:heading size="lg">Update user</flux:heading>
+                                    <flux:text class="mt-2">Update user datails</flux:text>
+                                </div>
+                                <flux:input label="Name" placeholder="Name" wire:model.defer="updateName"/>
+                                <flux:input label="Student Number" placeholder="Student number" wire:model.defer="updateStudentNumber"/>
+                                <flux:input label="Email" placeholder="Email" wire:model.defer="updateEmail"/>
+                                <div class="flex">
+                                    <flux:spacer />
+                                    <flux:button type="submit" variant="primary" >Update User</flux:button>
+                                </div>
+                            </div>
+                        @else
+                            <div class="flex justify-center p-6">
+                                <flux:icon.loading size="lg" /> 
+                            </div>
+                        @endif
+                    </flux:modal>
                     @endforeach
                 </tbody>
             </table>
         </div>
-      <!-- update user modal -->
-        <flux:modal name="edit-user" class="md:w-96">
-            <div class="space-y-6">
-                <div>
-                    <flux:heading size="lg">Update user</flux:heading>
-                    <flux:text class="mt-2">Update user datails</flux:text>
-                </div>
-                <flux:input label="Name" placeholder="Name" />
-                <flux:input label="Student Number" placeholder="Student number" />
-                <flux:input label="Email" placeholder="Email" />
-                <div class="flex">
-                    <flux:spacer />
-                    <flux:button type="submit" variant="primary">Save changes</flux:button>
-                </div>
-            </div>
-        </flux:modal>
+
 
         <!-- delete user moda -->
           

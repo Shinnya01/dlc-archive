@@ -52,7 +52,7 @@
         </button>
         </flux:modal.trigger>
 
-            <flux:modal :name="'previewFile'.$template->id" class="min-w-[60vw] max-w-5xl space-y-2" wire:model="showModal">
+            <flux:modal :name="'previewFile'.$template->id" class="min-w-[60vw] max-w-5xl space-y-2">
 
                <div class="h-[60vh] overflow-auto" id="pdf-preview-container-{{ $template->id }}">
     <div id="pdf-scroll-view-{{ $template->id }}"></div>

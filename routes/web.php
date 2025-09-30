@@ -38,7 +38,8 @@ Route::get('/', function () {
 
 Route::get('not-verified', function(){
     if(auth()->user()->status === 'pending'){
-        return view('not-verified');
+        return view('not-verified')
+        ->layout('component.layouts.guest');
     }else{
         return redirect()->route('home');
     }
