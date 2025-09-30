@@ -3,21 +3,24 @@
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
 
-    <div class="flex items-center justify-between">
-        <h1 class="text-4xl font-bold text-red-900">Templates</h1>
-        <div class="flex justify-end gap-2 w-xl">
-            <flux:input icon="magnifying-glass" placeholder="Search Users" />
-            <div class="flex items-center gap-2">
-                <flux:input placeholder="From" />
-                 - 
-                <flux:input placeholder="To" />
-            </div>
-            <flux:button icon="magnifying-glass" >Search</flux:button>
+    <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+            <h1 class="text-2xl md:text-4xl font-bold text-red-900">Templates</h1>
+    <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-end w-full md:w-auto">
+        <flux:input icon="magnifying-glass" placeholder="Search Users" class="w-full sm:w-48" />
+
+          <div class="flex items-center gap-2">
+            <flux:input placeholder="From" class="w-24 sm:w-32" />
+            <span>-</span>
+            <flux:input placeholder="To" class="w-24 sm:w-32" />
         </div>
+
+        <flux:button icon="magnifying-glass" class="w-full sm:w-auto">
+            Search
+        </flux:button>
+    </div>
     </div>
 
-
-    <div class="grid grid-cols-3 gap-4">
+    <div class="grid lg:grid-cols-3 gap-4">
         @foreach ($templates as $template)
         <div wire:key="{{ $template->id }}">
         
@@ -52,7 +55,7 @@
         </button>
         </flux:modal.trigger>
 
-            <flux:modal :name="'previewFile'.$template->id" class="min-w-[60vw] max-w-5xl space-y-2">
+            <flux:modal :name="'previewFile'.$template->id" class="min-w-[60vw] max-w-5xl space-y-2" wire:model="showModal">
 
                <div class="h-[60vh] overflow-auto" id="pdf-preview-container-{{ $template->id }}">
     <div id="pdf-scroll-view-{{ $template->id }}"></div>
