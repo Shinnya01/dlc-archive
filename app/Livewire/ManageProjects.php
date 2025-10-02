@@ -60,7 +60,7 @@ class ManageProjects extends Component
         $this->validate([
             'title'       => 'required|string|max:255',
             'year'        => 'required|integer|min:1900|max:'.date('Y'),
-            'authorFile'  => 'required|mimes:pdf|max:2048',
+            'authorFile'  => 'required|mimes:pdf|max:30000',
             'projectFile' => 'required|mimes:pdf|max:10240',
         ]);
 
