@@ -41,6 +41,8 @@
     </div>
  </div>
     <flux:modal name="archive" class="max-w-5xl">
+
+    
     <flux:heading class="text-red-900 text-2xl md:text-2xl ">Archive</flux:heading>
     <br>
     <div class="overflow-x-auto bg-white rounded-lg shadow">

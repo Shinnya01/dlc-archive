@@ -55,6 +55,8 @@
                             </flux:modal.trigger>   
                             </td>
                         </tr>
+
+                        
                      <flux:modal name="delete-user" class="md:w-96">
                         <div class="space-y-6">
                             <div>

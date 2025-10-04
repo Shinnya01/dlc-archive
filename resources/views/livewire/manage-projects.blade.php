@@ -198,8 +198,7 @@
         </div>
     </div>
     </flux:modal>
-
-    <!-- delete project -->
+    
      <flux:modal name="delete-project" class="md:w-96">
     <div class="space-y-6">
         <div>
