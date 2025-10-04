@@ -4,8 +4,10 @@ namespace App\Livewire;
 
 use App\Models\Request;
 use Livewire\Component;
+use Livewire\Attributes\Title;
 use Masmerise\Toaster\Toaster;
 
+#[Title('Inbox')]
 class UserInbox extends Component
 {
     public $requests;

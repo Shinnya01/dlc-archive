@@ -4,8 +4,10 @@ namespace App\Livewire;
 
 use App\Models\User;
 use Livewire\Component;
+use Livewire\Attributes\Title;
 use Masmerise\Toaster\Toaster;
 
+#[Title('Manage Users')]
 class ManageUsers extends Component
 {
     public $users;

@@ -3,7 +3,7 @@
     <h1 class="text-2xl md:text-4xl font-bold text-red-900">My ACM Requests</h1>
     
     <flux:modal.trigger name="archive">
-        <flux:button>Archive</flux:button>
+        <flux:button class="!bg-red-800 !text-white">Archive</flux:button>
     </flux:modal.trigger>
  </div>
  <div class="mt-6 p-4 bg-white rounded-xl shadow">
