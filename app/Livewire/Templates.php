@@ -4,9 +4,11 @@ namespace App\Livewire;
 
 use App\Models\Request;
 use Livewire\Component;
+use Livewire\Attributes\Title;
 use Masmerise\Toaster\Toaster;
 use App\Models\ResearchProject;
 
+#[Title('Templates')]
 class Templates extends Component
 {
 

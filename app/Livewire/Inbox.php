@@ -6,12 +6,14 @@ use App\Models\Request;
 use Livewire\Component;
 use Illuminate\Support\Str;
 use Smalot\PdfParser\Parser;
+use Livewire\Attributes\Title;
 use Masmerise\Toaster\Toaster;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 
+#[Title('Inbox')]
 class Inbox extends Component
 {
     public $requests;

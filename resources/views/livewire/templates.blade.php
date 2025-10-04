@@ -20,6 +20,8 @@
     </div>
     </div>
 
+
+    
     <div class="grid lg:grid-cols-3 gap-4">
         @foreach ($templates as $template)
         <div wire:key="{{ $template->id }}">

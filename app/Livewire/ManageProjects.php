@@ -4,6 +4,7 @@ namespace App\Livewire;
 
 use Livewire\Component;
 use Smalot\PdfParser\Parser;
+use Livewire\Attributes\Title;
 use Masmerise\Toaster\Toaster;
 use App\Models\ResearchProject;
 use Barryvdh\DomPDF\Facade\Pdf;
@@ -11,6 +12,7 @@ use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Facades\Storage;
 use Livewire\Features\SupportFileUploads\WithFileUploads;
 
+#[Title('Manage Projects')]
 class ManageProjects extends Component
 {
     use WithFileUploads;
@@ -58,7 +60,7 @@ class ManageProjects extends Component
         $this->validate([
             'title'       => 'required|string|max:255',
             'year'        => 'required|integer|min:1900|max:'.date('Y'),
-            'authorFile'  => 'required|mimes:pdf|max:2048',
+            'authorFile'  => 'required|mimes:pdf|max:30000',
             'projectFile' => 'required|mimes:pdf|max:10240',
         ]);
 

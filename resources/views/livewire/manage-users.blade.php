@@ -55,6 +55,8 @@
                             </flux:modal.trigger>   
                             </td>
                         </tr>
+
+                        
                      <flux:modal name="delete-user" class="md:w-96">
                         <div class="space-y-6">
                             <div>
@@ -63,19 +65,21 @@
                             </div>
                             <div class="flex">
                                 <flux:spacer />
-                                <flux:button type="submit" variant="primary">Cancel</flux:button>
-                                <flux:button type="submit" variant="danger" wire:click="removeUser({{ $user->id }})">Delete</flux:button>
+                                <flux:modal.close>
+                                    <flux:button type="submit" variant="primary">Cancel</flux:button>
+                                </flux:modal.close>
+                                <flux:button 
+                                    type="submit" 
+                                    variant="danger" 
+                                    wire:click="removeUser({{ $user->id }})" 
+                                    wire:loading.attr="disabled">
+                                    <span wire:loading.remove>Delete</span>
+                                    <span wire:loading>Deleting...</span>
+                                </flux:button>
                             </div>
                         </div>
                     </flux:modal>
-
-
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
-
-                            <!-- update user modal -->
+                             <!-- update user modal -->
                     <flux:modal :name="'edit-user'.$user->id" class="md:w-96">
                         <div class="space-y-6">
                         @if ($selectedUser && $selectedUser->id === $user->id)
@@ -107,6 +111,13 @@
                         @endif
                         </div>
                     </flux:modal>
+
+                    @endforeach
+                </tbody>
+            </table>
+        </div>
+
+                   
         <!-- delete user moda -->
           
     </div>

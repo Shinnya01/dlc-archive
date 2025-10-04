@@ -4,9 +4,11 @@ namespace App\Livewire;
 
 use App\Models\User;
 use Livewire\Component;
+use Livewire\Attributes\Title;
 use Masmerise\Toaster\Toaster;
 use Illuminate\Support\Facades\Hash;
 
+#[Title('Admin Accounts')]
 class AdminAccounts extends Component
 {
     public $admins;
