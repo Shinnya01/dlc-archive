@@ -31,7 +31,8 @@
             <div>
                 <h2 class="text-lg text-left font-semibold text-black">{{ $template->title }} </h2>
                 <p class="text-sm text-gray-500">
-                    @php
+                    {{ $template->citation }}
+                    <!-- @php
                         $authors = json_decode($template->author, true);
                         $formattedAuthors = [];
 
@@ -50,7 +51,7 @@
                         }
                     @endphp
 
-                    {{ !empty($formattedAuthors) ? implode(', ', $formattedAuthors) : 'N/A' }}</p>
+                    {{ !empty($formattedAuthors) ? implode(', ', $formattedAuthors) : 'N/A' }}</p> -->
             </div>
         </button>
         </flux:modal.trigger>

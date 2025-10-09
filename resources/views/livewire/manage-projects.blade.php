@@ -18,7 +18,7 @@
                             Title
                         </th>
                         <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
-                            Author
+                            Citation
                         </th>
                         <th class="px-6 py-3 text-left text-sm font-bold text-gray-700 uppercase tracking-wider">
                             Year
@@ -33,34 +33,12 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach($projects as $project)
-                        <tr>
+                        <tr wire:key="{{ $project->id }}">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                 {{ $project->title }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                               @php
-                                    $authors = json_decode($project->author, true);
-                                    $formattedAuthors = [];
-
-                                    if (!empty($authors) && is_array($authors)) {
-                                        $formattedAuthors = array_map(function ($author) {
-                                            $names = explode(' ', trim($author['name'] ?? ''));
-                                            $last = array_pop($names); // get last name
-                                            $initials = '';
-
-                                            foreach ($names as $n) {
-                                                if ($n !== '') {
-                                                    $initials .= strtoupper($n[0]) . '.';
-                                                }
-                                            }
-
-                                            return trim($initials . ' ' . $last);
-                                        }, $authors);
-                                    }
-                                @endphp
-
-                                {{ !empty($formattedAuthors) ? implode(', ', $formattedAuthors) : 'N/A' }}
-
+                                {{ $project->citation ?? "N/A"}}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                 {{ $project->year }}
@@ -77,11 +55,32 @@
                                 <flux:button icon="pencil-square" size="sm" class="mr-2 size-4"/>
                                 </flux:modal.trigger> 
 
-                                <flux:modal.trigger name="delete-project">
+                                <flux:modal.trigger :name="'delete-project'. $project->id">
                                 <flux:button variant="danger" icon="trash" size="sm" class="size-4"/>
                                 </flux:modal.trigger> 
                             </td>
                         </tr>
+
+                        
+                        <!-- delete project -->
+                        <flux:modal :name="'delete-project'. $project->id" class="md:w-96">
+                            <form wire:submit.prevent="deleteProject({{ $project->id }})">
+                            <div class="space-y-6">
+                                <div>
+                                    <flux:heading size="lg">Delete research project</flux:heading>
+                                    <flux:text class="mt-2">This action can't be undone</flux:text>
+                                </div>
+                                <div class="flex">
+                                    <flux:spacer />
+                                    <flux:modal.close>
+                                    <flux:button type="submit" variant="ghost">Cancel</flux:button>
+                                    </flux:modal.close>
+                                    <flux:button type="button" variant="danger" wire:click="deleteProject({{ $project->id }})" wire:loading.attr="disabled" wire:target="deleteProject"><span wire:loading.remove>Delete</span><span wire:loading>Deleting...</span></flux:button>
+                                </div>
+                            </div>
+                            </form>
+                        </flux:modal>
+
                     @endforeach
                 
                         {{-- <tr>
@@ -157,7 +156,7 @@
                     wire:model="authorFile" 
                 />
                 @if($authorFile)
-                    <div>Success</div>
+                    <div class="text-green-600">Success</div>
                 @endif
 
                 <flux:input 
@@ -170,7 +169,7 @@
 
                 
                 @if($projectFile)
-                    <div>Success</div>
+                    <div class="text-green-600">Success</div>
                 @endif
 
                 <div class="flex">
@@ -199,18 +198,4 @@
     </div>
     </flux:modal>
 
-    <!-- delete project -->
-     <flux:modal name="delete-project" class="md:w-96">
-    <div class="space-y-6">
-        <div>
-            <flux:heading size="lg">Delete research project</flux:heading>
-            <flux:text class="mt-2">This action can't be undone</flux:text>
-        </div>
-        <div class="flex">
-            <flux:spacer />
-            <flux:button type="submit" variant="primary">Cancel</flux:button>
-            <flux:button type="submit" variant="danger">Delete</flux:button>
-        </div>
-    </div>
-    </flux:modal>
 </div>

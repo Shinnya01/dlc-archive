@@ -35,6 +35,16 @@ class ManageProjects extends Component
        $this->fetchProject();
     }
 
+    public function deleteProject($id)
+    {
+        $deleteProject = ResearchProject::find($id);
+        
+        $deleteProject->delete();
+        $this->modal('delete-project'. $id)->close();
+        $this->fetchProject();
+        Toaster::success('Delete Success!');
+    }
+
     public function updatedSearch()
     {
         // when search changes, refetch projects
@@ -56,28 +66,21 @@ class ManageProjects extends Component
 
     public function createProject()
     {
+        ini_set('max_execution_time', 3000);
         // 1. Validate inputs
         $this->validate([
             'title'       => 'required|string|max:255',
             'year'        => 'required|integer|min:1900|max:'.date('Y'),
             'authorFile'  => 'required|mimes:pdf|max:30000',
-            'projectFile' => 'required|mimes:pdf|max:10240',
+            'projectFile' => 'required|mimes:pdf|max:30000',
         ]);
 
         // 2. Store PDFs
-        // $authorPath  = $this->authorFile->store('projects/authorFile', 'public');
-        // $projectPath = $this->projectFile->store('projects', 'public');
-
         $authorPath  = $this->authorFile->store('projects/authorFile', 'spaces');
         $projectPath = $this->projectFile->store('projects', 'spaces');
 
-
-        // $authorFullPath  = storage_path('app/public/'.$authorPath);
-        // $projectFullPath = storage_path('app/public/'.$projectPath);
-
         $authorUrl  = Storage::disk('spaces')->url($authorPath);
         $projectUrl = Storage::disk('spaces')->url($projectPath);
-
 
         // 3. Generate authors & keywords using helper methods
         $authorsJson  = $this->generateAuthor($authorUrl);
@@ -95,9 +98,10 @@ class ManageProjects extends Component
             $this->reset(['title','year','authorFile','projectFile']);
             return; 
         }
-        
 
-        // 4. Save to DB
+        // 4. Generate citation
+        $citation = $this->generateCitation($this->title, $authorsJson, $this->year, 'APA');
+        // 5. Save to DB
         ResearchProject::create([
             'title'       => $this->title,
             'author'      => $authorsJson,
@@ -105,11 +109,10 @@ class ManageProjects extends Component
             'year'        => $this->year,
             'author_file' => 'storage/'.$authorPath,
             'file'        => $projectPath,
+            'citation'    => $citation,   // Make sure your DB has this column
         ]);
 
-        // dd($keywordsJson);
-
-        // 5. Close modal and notify
+        // 6. Close modal and notify
         $this->modal('create-project')->close();
         $this->fetchProject();
         Toaster::success('Project Created!');
@@ -161,12 +164,9 @@ class ManageProjects extends Component
                     ],
                 ]);
             if ($response->failed()) {
-                // Token or rate limit reached
                 if ($response->status() == 429 || str_contains($response->body(), 'RateLimitReached')) {
-                    // Toaster::error('AI token limit reached. Please try again later.');
                     return 'used_all_token';
                 } else {
-                    // Toaster::error('AI request failed. Check logs for details.');
                     return 'ai_request_failed';
                 }
                 return $authorsJson;
@@ -199,14 +199,12 @@ class ManageProjects extends Component
             $pages = $pdf->getPages();
             $pdfText = '';
 
-            // Extract pages 10–11
             for ($i = 9; $i < 11; $i++) {
                 if (isset($pages[$i])) {
                     $pdfText .= $pages[$i]->getText() . "\n";
                 }
             }
 
-            // Extract only ABSTRACT → CHAPTER I
             if (preg_match('/ABSTRACT(.*?)CHAPTER\s*I/is', $pdfText, $matches)) {
                 $abstractText = trim($matches[1]);
             } else {
@@ -245,15 +243,11 @@ class ManageProjects extends Component
                 ]);
 
              if ($response->failed()) {
-                // Token or rate limit reached
                 if ($response->status() == 429 || str_contains($response->body(), 'RateLimitReached')) {
-                    // Toaster::error('AI token limit reached. Please try again later.');
                     return 'used_all_token';
                 } else {
-                    // Toaster::error('AI request failed. Check logs for details.');
                     return 'ai_request_failed';
                 }
-
                 return $keywordsJson;
             }
 
@@ -271,14 +265,72 @@ class ManageProjects extends Component
             return $keywordsJson;
 
         } catch (\Exception $e) {
-            \Log::error('Author extraction failed: '.$e->getMessage());
+            \Log::error('Keyword extraction failed: '.$e->getMessage());
             return json_encode([], JSON_UNESCAPED_UNICODE);
         }
     }
 
+    public function generateCitation($title, $authorsJson, $year, $style = 'APA')
+    {
+        try {
+            $authors = json_decode($authorsJson, true) ?? [];
+            $authorsText = '';
+
+            if (!empty($authors)) {
+                $authorNames = array_map(fn($a) => $a['name'] ?? '', $authors);
+                $authorsText = implode(', ', array_filter($authorNames));
+            }
+
+           $prompt = <<<PROMPT
+Generate a {$style} reference entry for the following academic thesis.
+Do NOT mark it as "Unpublished master's thesis" or include institution names.
+Format it like a published work in APA style.
+
+Title: {$title}
+Authors: {$authorsText}
+Year: {$year}
+
+Output ONLY the citation string, no extra text.
+PROMPT;
 
 
+            $token = config('services.github_models.token');
 
+            $citation = '';
+
+            $response = Http::withToken($token)
+                ->withHeaders([
+                    'Accept' => 'application/vnd.github+json',
+                    'X-GitHub-Api-Version' => '2022-11-28',
+                    'Content-Type' => 'application/json',
+                ])
+                ->post('https://models.github.ai/inference/chat/completions', [
+                    'model' => 'openai/gpt-4.1-nano', 
+                    'messages' => [
+                        ['role' => 'user', 'content' => $prompt],
+                    ],
+                    ]);
+
+                if ($response->failed()) {
+                    if ($response->status() == 429 || str_contains($response->body(), 'RateLimitReached')) {
+                        return 'used_all_token';
+                    } else {
+                        return 'ai_request_failed';
+                    }
+                }
+
+            if ($response->successful()) {
+                $content = $response->json()['choices'][0]['message']['content'] ?? '';
+                $citation = trim($content);
+            }
+
+            return $citation;
+
+        } catch (\Exception $e) {
+            \Log::error('Citation generation failed: '.$e->getMessage());
+            return '';
+        }
+    }
 
     public function render()
     {
