@@ -131,11 +131,5 @@
             </form>
        </flux:modal>
 
-       <!-- edit admin modal -->
-
-
-       <!-- admin acc delete modal -->
-
-
     </div>
 </div>

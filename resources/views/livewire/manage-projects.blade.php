@@ -197,5 +197,18 @@
         </div>
     </div>
     </flux:modal>
-
+    
+     <flux:modal name="delete-project" class="md:w-96">
+    <div class="space-y-6">
+        <div>
+            <flux:heading size="lg">Delete research project</flux:heading>
+            <flux:text class="mt-2">This action can't be undone</flux:text>
+        </div>
+        <div class="flex">
+            <flux:spacer />
+            <flux:button type="submit" variant="primary">Cancel</flux:button>
+            <flux:button type="submit" variant="danger">Delete</flux:button>
+        </div>
+    </div>
+    </flux:modal>
 </div>
