@@ -12,6 +12,7 @@ class ResearchProject extends Model
         'keywords',
         'year',
         'file',
+        'citation',
     ];
 
     protected $casts = [

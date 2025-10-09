@@ -14,6 +14,7 @@ return new class extends Migration
             $table->year('year');
             $table->json('author')->nullable();
             $table->json('keywords')->nullable();
+            $table->text('citation')->nullable();
             $table->string('file')->nullable(); 
             $table->timestamps();
         });

@@ -122,7 +122,7 @@
                     </div>
                     <flux:input label="Name" wire:model.defer="name" placeholder="e.g. Juan Carlo" />
                     <flux:input label="Email" wire:model.defer="email" placeholder="e.g. juan@gmail.com" />
-                    <flux:input label="Password" wire:model="password" placeholder="Password" />
+                    <flux:input type="password" label="Password" wire:model="password" placeholder="Password" viewable/>
                     <div class="flex">
                         <flux:spacer />
                         <flux:button type="submit" variant="primary">Create</flux:button>
@@ -130,12 +130,6 @@
                 </div>
             </form>
        </flux:modal>
-
-       <!-- edit admin modal -->
-
-
-       <!-- admin acc delete modal -->
-
 
     </div>
 </div>

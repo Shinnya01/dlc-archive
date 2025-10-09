@@ -107,9 +107,10 @@ new #[Layout('components.layouts.auth')] class extends Component {
     </div>
     <x-auth-header :title="__('Login - PLC Archive  ')" :description="__('Enter your email and password below to log in')" />
 
-    <!-- Session Status -->
+    <!-- Session Status --> 
     <x-auth-session-status class="text-center" :status="session('status')" />
 
+    <!-- naman ne -->
 
     <form method="POST" wire:submit="login" class="flex flex-col gap-6 !text-black">
         <!-- Email Address -->
