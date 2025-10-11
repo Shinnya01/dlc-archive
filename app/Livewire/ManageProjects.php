@@ -76,11 +76,11 @@ class ManageProjects extends Component
         ]);
 
         // 2. Store PDFs
-        $authorPath  = $this->authorFile->store('projects/authorFile', 'public');
-        $projectPath = $this->projectFile->store('projects', 'public');
+        $authorPath  = $this->authorFile->store('projects/authorFile', 'spaces');
+        $projectPath = $this->projectFile->store('projects', 'spaces');
 
-        // $authorUrl  = Storage::disk('spaces')->url($authorPath);
-        // $projectUrl = Storage::disk('spaces')->url($projectPath);
+        $authorUrl  = Storage::disk('spaces')->url($authorPath);
+        $projectUrl = Storage::disk('spaces')->url($projectPath);
 
         // 3. Generate authors & keywords using helper methods
         $authorsJson  = $this->generateAuthor($authorPath);

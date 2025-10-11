@@ -10,7 +10,9 @@ use Livewire\Attributes\Title;
 use Masmerise\Toaster\Toaster;
 use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Support\Facades\Log;
+use App\Mail\AcmRequestApprovedMail;
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 
 #[Title('Inbox')]
@@ -221,6 +223,9 @@ class Inbox extends Component
         $request->status = 'approved';
         $request->save();
 
+        Mail::to($request->user->email)->send(
+            new AcmRequestApprovedMail($request->user->name, $request->pdf_path)
+        );
         $this->fetchRequest();
         Toaster::success('Request Approve and ACM Generated Successfully!');
     

@@ -142,5 +142,8 @@
 
         @fluxScripts
 
+
+        @livewireScripts
+        @livewireStyles
     </body>
 </html>
