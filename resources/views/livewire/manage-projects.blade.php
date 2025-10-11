@@ -67,8 +67,8 @@
                             <form wire:submit.prevent="deleteProject({{ $project->id }})">
                             <div class="space-y-6">
                                 <div>
-                                    <flux:heading size="lg">Delete research project</flux:heading>
-                                    <flux:text class="mt-2">This action can't be undone</flux:text>
+                                    <flux:heading size="lg">Delete research project?</flux:heading>
+                                    <flux:text class="mt-2">This action is permanent and cannot be undone.</flux:text>
                                 </div>
                                 <div class="flex">
                                     <flux:spacer />
@@ -201,8 +201,8 @@
      <flux:modal name="delete-project" class="md:w-96">
     <div class="space-y-6">
         <div>
-            <flux:heading size="lg">Delete research project</flux:heading>
-            <flux:text class="mt-2">This action can't be undone</flux:text>
+            <flux:heading size="lg">Delete research project?</flux:heading>
+            <flux:text class="mt-2">This action is permanent and cannot be undone.</flux:text>
         </div>
         <div class="flex">
             <flux:spacer />

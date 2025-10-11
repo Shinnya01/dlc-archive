@@ -51,11 +51,11 @@
                                         <div class="text-start">
                                             <flux:heading size="lg" class="text-red-600">Delete Admin</flux:heading>
                                             <flux:text class="mt-2 text-gray-600">
-                                                 Are you sure you want to delete 
-                                                 <span class="font-semibold text-gray-900">{{ $admin->name }}</span>?
+                                                 Are you sure you want to delete
+                                                 <span class="font-semibold text-gray-900">{{ $admin->name }}?</span>?
                                             </flux:text>
                                             <flux:text class="mt-1 text-sm text-gray-500">
-                                                  This action cannot be undone.
+                                                  This action is permanent and cannot be undone.
                                               </flux:text>
                                             </div>
                                         {{-- Action Buttons --}}
