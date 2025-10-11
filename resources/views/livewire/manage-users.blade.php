@@ -61,7 +61,7 @@
                         <div class="space-y-6">
                             <div>
                                 <flux:heading :name="'delete-user'.$user->id" size="lg">Are you sure to delete this user?</flux:heading>
-                                <flux:text class="mt-2">This action can't be undone</flux:text>
+                                <flux:text class="mt-2">This action is permanent and cannot be undone.</flux:text>
                             </div>
                             <div class="flex">
                                 <flux:spacer />
