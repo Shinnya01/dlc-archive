@@ -217,12 +217,12 @@ class Inbox extends Component
         }
 
 
-        // $request->pdf_path = $path;
-        // $request->status = 'approved';
-        // $request->save();
+        $request->pdf_path = $path;
+        $request->status = 'approved';
+        $request->save();
 
-        // $this->fetchRequest();
-        // Toaster::success('Request Approve and ACM Generated Successfully!');
+        $this->fetchRequest();
+        Toaster::success('Request Approve and ACM Generated Successfully!');
     
         // Example of generating PDF:
         // $pdf = Pdf::loadView('pdf.acm-template', compact('acmData', 'authors'));

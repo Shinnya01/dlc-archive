@@ -2,10 +2,12 @@
 
 namespace App\Livewire;
 
+use App\Models\History;
 use App\Models\Request;
 use Livewire\Component;
 use Livewire\Attributes\Title;
 use Masmerise\Toaster\Toaster;
+use Illuminate\Support\Facades\Storage;
 
 #[Title('Inbox')]
 class UserInbox extends Component
@@ -16,6 +18,28 @@ class UserInbox extends Component
     public function mount()
     {
         $this->fetchRequests();
+    }
+    
+    public function downloadRequest($id)
+    {
+        $request = Request::where('user_id', auth()->id())->findOrFail($id);
+
+        // if (!Storage::exists($request->pdf_path)) {
+        //     Toaster::error('File not found.');
+        //     return;
+        // }
+
+        // 🟢 Show info toast
+        Toaster::info('Preparing your download...');
+
+        // 🟢 Log to History
+        History::create([
+            'user_id' => auth()->id(),
+            'detail' => 'Download',
+        ]);
+
+        // 🟢 Dispatch event to browser (Livewire <-> JS bridge)
+        // $this->dispatch('triggerDownload', Storage::url($request->pdf_path));
     }
 
     public function fetchRequests()

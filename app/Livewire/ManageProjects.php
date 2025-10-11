@@ -76,15 +76,15 @@ class ManageProjects extends Component
         ]);
 
         // 2. Store PDFs
-        $authorPath  = $this->authorFile->store('projects/authorFile', 'spaces');
-        $projectPath = $this->projectFile->store('projects', 'spaces');
+        $authorPath  = $this->authorFile->store('projects/authorFile', 'public');
+        $projectPath = $this->projectFile->store('projects', 'public');
 
-        $authorUrl  = Storage::disk('spaces')->url($authorPath);
-        $projectUrl = Storage::disk('spaces')->url($projectPath);
+        // $authorUrl  = Storage::disk('spaces')->url($authorPath);
+        // $projectUrl = Storage::disk('spaces')->url($projectPath);
 
         // 3. Generate authors & keywords using helper methods
-        $authorsJson  = $this->generateAuthor($authorUrl);
-        $keywordsJson = $this->generateKeyword($projectUrl);
+        $authorsJson  = $this->generateAuthor($authorPath);
+        $keywordsJson = $this->generateKeyword($projectPath);
 
         if ($authorsJson === 'used_all_token' || $keywordsJson === 'used_all_token') {
             Toaster::error('AI token limit reached. Please try again later.');

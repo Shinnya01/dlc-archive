@@ -4,8 +4,10 @@ namespace App\Livewire;
 
 use App\Models\User;
 use Livewire\Component;
+use App\Mail\UserApprovedMail;
 use Livewire\Attributes\Title;
 use Masmerise\Toaster\Toaster;
+use Illuminate\Support\Facades\Mail;
 
 #[Title('Manage Users')]
 class ManageUsers extends Component
@@ -75,6 +77,7 @@ class ManageUsers extends Component
         $user->status = 'verified';
 
         $user->save();
+        Mail::to($user->email)->queue(new UserApprovedMail($user->name));
         $this->fetchUser();
         Toaster::success('User Verified Successfully!');
     }

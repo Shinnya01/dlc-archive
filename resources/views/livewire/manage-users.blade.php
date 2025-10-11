@@ -30,7 +30,7 @@
                 </thead>
                 <tbody class="bg-white divide-y divide-gray-200">
                     @foreach($users as $user)
-                        <tr>
+                        <tr wire:key="{{ $user->id }}">
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
                                 {{ $user->name }}
                             </td>
@@ -41,7 +41,7 @@
                                 {{ $user->email }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                                {{ $user->status }}
+                            <div class="flex items-center gap-1 text-green-600"><flux:icon.check-badge class="size-4" /> {{ $user->status }}</div>
                             </td>
                             <td class="px-6 py-4 flex gap-2 justify-end whitespace-nowrap text-sm">
                             @if($user->status === 'pending')
@@ -50,14 +50,14 @@
                             <flux:modal.trigger :name="'edit-user'.$user->id" wire:click="editUser({{ $user->id }})">
                                 <flux:button class="mr-2" icon="pencil-square" size="sm" class=""/>
                             </flux:modal.trigger> 
-                             <flux:modal.trigger name="delete-user">
+                             <flux:modal.trigger :name="'delete-user'.$user->id">
                                 <flux:button variant="danger" icon="trash" size="sm" class=""/>
                             </flux:modal.trigger>   
                             </td>
                         </tr>
 
                         
-                     <flux:modal name="delete-user" class="md:w-96">
+                     <flux:modal :name="'delete-user'.$user->id" class="md:w-96">
                         <div class="space-y-6">
                             <div>
                                 <flux:heading :name="'delete-user'.$user->id" size="lg">Are you sure to delete this user?</flux:heading>
@@ -66,7 +66,7 @@
                             <div class="flex">
                                 <flux:spacer />
                                 <flux:modal.close>
-                                    <flux:button type="submit" variant="primary">Cancel</flux:button>
+                                    <flux:button type="submit" variant="ghost">Cancel</flux:button>
                                 </flux:modal.close>
                                 <flux:button 
                                     type="submit" 

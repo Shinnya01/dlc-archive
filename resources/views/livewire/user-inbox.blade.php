@@ -27,9 +27,12 @@
                             @if($request->status === 'pending')
                                 <flux:button variant="danger" icon="x-mark" size="sm">Cancel</flux:button>
                             @else
-                                <flux:button icon="folder-arrow-down" size="sm"
-                                    href="{{ asset(str_replace('public/', 'storage/', $request->pdf_path)) }}"
-                                    target="_blank">Download</flux:button>
+                                <flux:button 
+                                    icon="folder-arrow-down" 
+                                    size="sm"
+                                    wire:click="downloadRequest({{ $request->id }})">
+                                    Download
+                                </flux:button>
                                 <flux:button variant="danger" icon="x-mark" size="sm"
                                     wire:click="deleteRequest({{ $request->id }})">Delete</flux:button>
                             @endif
@@ -97,6 +100,22 @@
     </div>
 </flux:modal>
 
+<script>
+    document.addEventListener('livewire:init', () => {
+        Livewire.on('triggerDownload', (fileUrl) => {
+            // Wait a bit to simulate “preparing”
+            setTimeout(() => {
+                const link = document.createElement('a');
+                link.href = fileUrl;
+                link.target = '_blank';
+                link.download = '';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+            }, 1200); // small delay to show toast
+        });
+    });
+</script>
 
 </div>
 

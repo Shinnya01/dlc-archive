@@ -64,7 +64,7 @@
     <div id="pdf-scroll-view-{{ $template->id }}"></div>
 </div>
 
-                <flux:textarea placeholder="Enter Purpose of the Request" wire:model="purpose"/>
+                <flux:textarea placeholder="Enter Purpose of the Request" wire:model="purpose" required/>
                 <div class="flex justify-end">
                     <flux:button 
                         class="!bg-red-800 !text-white" 
@@ -113,11 +113,11 @@ function renderPage(pdf, pageNum, container) {
         page.render({ canvasContext: ctx, viewport: scaledViewport }).promise.then(() => {
             // Optional: add watermark
             const logo = new Image();
-            logo.src = '/images/lubao_logo.png';
+            logo.src = '/dhvsu.JPG';
             logo.onload = () => {
                 ctx.save();
-                ctx.globalAlpha = 0.13;
-                const logoWidth = canvas.width * 0.5;
+                ctx.globalAlpha = 0.11;
+                const logoWidth = canvas.width * 0.7;
                 const logoHeight = logo.height * (logoWidth / logo.width);
                 ctx.drawImage(logo, (canvas.width - logoWidth) / 2, (canvas.height - logoHeight) / 2, logoWidth, logoHeight);
                 ctx.restore();

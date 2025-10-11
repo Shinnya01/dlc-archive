@@ -48,11 +48,11 @@ Route::get('not-verified', function(){
 })->name('not-verified');
 
 Route::get('dashboard', function () {
-    $userCount = User::where('role', 'user')->count();
+    // $userCount = User::where('role', 'user')->count();
     $name = auth()->user()->name;
-    $projectCount = ResearchProject::count();
+    // $projectCount = ResearchProject::count();
 
-    return view('dashboard', compact('userCount', 'projectCount' ,'name'));
+    return view('dashboard', compact('name'));
 })
 ->middleware(['auth', 'verified', 'role:admin'])
 ->name('dashboard');
