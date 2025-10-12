@@ -30,7 +30,9 @@
                                 <flux:button 
                                     icon="folder-arrow-down" 
                                     size="sm"
-                                    wire:click="downloadRequest({{ $request->id }})">
+                                    wire:click="downloadRequest({{ $request->id }})"
+                                    {{-- href="{{ asset(str_replace('public/', 'storage/', $request->pdf_path)) }}" target="_blank" --}}
+                                    >
                                     Download
                                 </flux:button>
                                 <flux:button variant="danger" icon="x-mark" size="sm"

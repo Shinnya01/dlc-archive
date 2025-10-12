@@ -22,15 +22,18 @@ class UserInbox extends Component
     
     public function downloadRequest($id)
     {
-        $request = Request::where('user_id', auth()->id())->findOrFail($id);
+        $request = \App\Models\Request::find($id);
 
-        // if (!Storage::exists($request->pdf_path)) {
-        //     Toaster::error('File not found.');
-        //     return;
-        // }
+        if (!$request) {
+            \Masmerise\Toaster\Toaster::error('Request not found.');
+            return;
+        }
 
-        // 🟢 Show info toast
-        Toaster::info('Preparing your download...');
+        $file = str_replace('public/', '', $request->pdf_path);
+        if (!\Storage::disk('public')->exists($file)) {
+            \Masmerise\Toaster\Toaster::error('File not found.');
+            return;
+        }
 
         // 🟢 Log to History
         History::create([
@@ -38,8 +41,7 @@ class UserInbox extends Component
             'detail' => 'Download',
         ]);
 
-        // 🟢 Dispatch event to browser (Livewire <-> JS bridge)
-        // $this->dispatch('triggerDownload', Storage::url($request->pdf_path));
+        return \Storage::disk('public')->download($file);
     }
 
     public function fetchRequests()

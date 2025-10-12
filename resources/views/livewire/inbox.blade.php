@@ -58,6 +58,7 @@
                                 @else
                                     @if($request->pdf_path)
                                     <flux:button icon="document-arrow-down" size="sm" href="{{ asset(str_replace('public/', 'storage/', $request->pdf_path)) }}" target="_blank">Download</flux:button>
+                                    {{-- <flux:button icon="document-arrow-down" size="sm" wire:click="download({{ $request->id }})" target="_blank">Download</flux:button> --}}
                                     @endif
                                     <flux:button variant="danger" icon="trash" size="sm" wire:click="rejectRequest({{ $request->id }})">Delete</flux:button>
                                 @endif

@@ -214,20 +214,22 @@ class Inbox extends Component
             $request->status = 'approved';
             $request->save();
 
+            Mail::to($request->user->email)->send(
+                new AcmRequestApprovedMail($request->user->name, $request->pdf_path)
+            );
+
             $this->fetchRequest();
             Toaster::success('Request approved and ACM PDF generated successfully!');
         }
 
 
-        $request->pdf_path = $path;
-        $request->status = 'approved';
-        $request->save();
+        // $request->pdf_path = $path;
+        // $request->status = 'approved';
+        // $request->save();
 
-        Mail::to($request->user->email)->send(
-            new AcmRequestApprovedMail($request->user->name, $request->pdf_path)
-        );
-        $this->fetchRequest();
-        Toaster::success('Request Approve and ACM Generated Successfully!');
+
+        // $this->fetchRequest();
+        // Toaster::success('Request Approve and ACM Generated Successfully!');
     
         // Example of generating PDF:
         // $pdf = Pdf::loadView('pdf.acm-template', compact('acmData', 'authors'));

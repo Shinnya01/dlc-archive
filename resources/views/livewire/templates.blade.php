@@ -79,6 +79,11 @@
         </div>
          @endforeach
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.min.js"></script>
+<script>
+    pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.12.313/pdf.worker.min.js';
+</script>
+
     <script>
         function previewPdf(templateId, fileUrl) {
     const container = document.getElementById(`pdf-scroll-view-${templateId}`);
