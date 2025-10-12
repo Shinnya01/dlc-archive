@@ -59,4 +59,4 @@
             loginChart.update();
         }
     </script>
-            </div>
+</div>
