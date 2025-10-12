@@ -1,66 +1,36 @@
-# ============================================
-# Stage 1: Build Composer dependencies
-# ============================================
-FROM composer:2.7 AS composer_builder
+# Base PHP
+FROM php:8.2-fpm
 
-WORKDIR /app
+# Install dependencies
+RUN apt-get update && apt-get install -y \
+    git curl libzip-dev zip unzip libpng-dev libonig-dev libxml2-dev supervisor nginx \
+    && docker-php-ext-install pdo_mysql mbstring zip exif pcntl bcmath gd
 
-# Copy composer files and install dependencies (no dev)
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader
+# Composer
+COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 
-# ============================================
-# Stage 2: Build frontend assets (Vite or Mix)
-# ============================================
-FROM node:20-alpine AS node_builder
-
-WORKDIR /app
-
-COPY package.json package-lock.json* yarn.lock* ./
-RUN npm install
-
-COPY . .
-RUN npm run build
-
-# ============================================
-# Stage 3: Final PHP + Nginx image
-# ============================================
-FROM php:8.3-fpm-alpine
-
-# Install system dependencies
-RUN apk add --no-cache nginx bash git supervisor curl zip unzip libpng-dev oniguruma-dev libxml2-dev \
-    && docker-php-ext-install pdo pdo_mysql mbstring exif pcntl bcmath gd
-
-# Create app directory
 WORKDIR /var/www/html
-
-# Copy application files
 COPY . .
 
-# Copy built vendor and assets from previous stages
-COPY --from=composer_builder /app/vendor ./vendor
-COPY --from=node_builder /app/public/build ./public/build
+# PHP deps
+RUN composer install --no-dev --optimize-autoloader
 
-# Create storage symlink
-RUN php artisan storage:link || true
+# Node.js + build assets
+RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt-get install -y nodejs
+RUN npm install && npm run build
 
-# Copy nginx configuration
-COPY .docker/nginx.conf /etc/nginx/nginx.conf
+# Permissions
+RUN chown -R www-data:www-data /var/www/html/storage /var/www/html/bootstrap/cache
 
-# Copy supervisor configuration
-COPY .docker/supervisord.conf /etc/supervisord.conf
+# Supervisor config
+COPY supervisord.conf /etc/supervisor/conf.d/supervisord.conf
 
-# Set permissions for Laravel storage and bootstrap
-RUN chown -R www-data:www-data storage bootstrap/cache \
-    && chmod -R 775 storage bootstrap/cache
+# Nginx config
+COPY nginx.conf /etc/nginx/sites-enabled/default
 
-# Set environment variables (for DigitalOcean)
-ENV APP_ENV=production
-ENV APP_DEBUG=false
-ENV APP_URL=${APP_URL:-http://localhost}
+# Expose internal ports
+EXPOSE 8000 
 
-# Expose the HTTP port
-EXPOSE 8080
-
-# Start both PHP-FPM and Nginx via Supervisor
-CMD ["/usr/bin/supervisord", "-c", "/etc/supervisord.conf"]
+# Start Supervisor (Laravel + Reverb + Scheduler)
+CMD php artisan migrate --force && /usr/bin/supervisord -c /etc/supervisor/conf.d/supervisord.conf
+  
