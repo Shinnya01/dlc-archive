@@ -1,18 +1,18 @@
 <div class="h-auto w-full rounded-xl border border-neutral-200 bg-zinc-50 p-4 col-span-2">
-                <div class="flex justify-between items-start">
-                    <h1 class="text-3xl font-bold text-red-900">Login Chart</h1>
-                    <div class="flex gap-2 max-w-sm">
-                        <flux:select class="mb-4 w-xs" onchange="updateChart(this.value)">
-                            <flux:select.option value="daily">Daily</flux:select.option>
-                            <flux:select.option value="weekly">Weekly</flux:select.option>
-                            <flux:select.option value="yearly">Yearly</flux:select.option>
-                        </flux:select>
-                    </div>
-                </div>
+                <div class="flex justify-between items-start mb-4">
+        <h1 class="text-3xl font-bold text-red-900">Login Chart</h1>
+        <div class="flex gap-2 max-w-sm">
+            <flux:select class="mb-4 w-xs" onchange="updateChart(this.value)">
+                <flux:select.option value="daily">Daily</flux:select.option>
+                <flux:select.option value="weekly">Weekly</flux:select.option>
+                <flux:select.option value="yearly">Yearly</flux:select.option>
+            </flux:select>
+        </div>
+    </div>
 
-                <div class="w-full h-80">
-                    <canvas id="loginChart"></canvas>
-                </div>
+    <div class="flex-1">
+        <canvas id="loginChart" class="w-full h-full"></canvas>
+    </div>
                 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
         <script>

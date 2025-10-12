@@ -20,7 +20,8 @@ class RecentLogins extends Component
 
         $this->recentLogins = LoginLog::with('user')
             ->orderBy('logged_in_at', 'desc')
-            ->get();
+            ->get()
+            ->unique('user_id');
     }
 
     public function render()
