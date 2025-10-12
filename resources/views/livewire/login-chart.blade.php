@@ -1,67 +1,62 @@
-<div x-data x-init="
-    const ctx = $refs.canvas.getContext('2d');
-    new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: @json($labels),
-            datasets: [{
-                label: 'Logins',
-                data: @json($data),
-                backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                borderColor: 'rgba(54, 162, 235, 1)',
-                borderWidth: 1
-            }]
-        },
-        options: {
-            responsive: true,
-            scales: { y: { beginAtZero: true } }
-        }
-    });
-">
-    <canvas x-ref="canvas" width="400" height="200"></canvas>
-</div>
+<div class="h-auto w-full rounded-xl border border-neutral-200 bg-zinc-50 p-4 col-span-2">
+                <div class="flex justify-between items-start">
+                    <h1 class="text-3xl font-bold text-red-900">Login Chart</h1>
+                    <div class="flex gap-2 max-w-sm">
+                        <flux:select class="mb-4 w-xs" onchange="updateChart(this.value)">
+                            <flux:select.option value="daily">Daily</flux:select.option>
+                            <flux:select.option value="weekly">Weekly</flux:select.option>
+                            <flux:select.option value="yearly">Yearly</flux:select.option>
+                        </flux:select>
+                    </div>
+                </div>
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+                <div class="w-full h-80">
+                    <canvas id="loginChart"></canvas>
+                </div>
+                <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
-<script>
-    function renderLoginChart(labels, data) {
+        <script>
+        const loginData = @json($loginData);
+
         const ctx = document.getElementById('loginChart').getContext('2d');
 
-        // Destroy existing chart if exists (important for Livewire re-renders)
-        if (window.loginChartInstance) {
-            window.loginChartInstance.destroy();
-        }
-
-        window.loginChartInstance = new Chart(ctx, {
-            type: 'bar', // change type if you want
+        // Initial chart as a line chart
+        let loginChart = new Chart(ctx, {
+            type: 'line', // <-- changed from 'bar' to 'line'
             data: {
-                labels: labels,
+                labels: loginData.daily.labels,
                 datasets: [{
                     label: 'Logins',
-                    data: data,
-                    backgroundColor: 'rgba(54, 162, 235, 0.5)',
-                    borderColor: 'rgba(54, 162, 235, 1)',
-                    borderWidth: 1
+                    data: loginData.daily.data,
+                    borderColor: 'rgba(127, 29, 29, 1)',
+                    backgroundColor: 'rgba(127, 29, 29, 0.6)',
+                    fill: true,       // fills the area under the line
+                    tension: 0.3,     // smooth curve
+                    pointBackgroundColor: 'rgba(127, 29, 29, 1)',
+                    pointBorderColor: '#fff',
+                    pointRadius: 4
                 }]
             },
             options: {
                 responsive: true,
+                maintainAspectRatio: false,
                 scales: {
-                    y: { beginAtZero: true }
+                    y: { 
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0, // ensures whole numbers
+                            stepSize: 1   // forces integer steps
+                        }
+                    }
                 }
             }
         });
-    }
 
-    // Initial render on page load
-    document.addEventListener('livewire:load', function () {
-        renderLoginChart(@json($labels), @json($data));
-    });
-
-    // Re-render chart whenever Livewire updates the component
-    Livewire.hook('message.processed', (message, component) => {
-        if (component.fingerprint.name === 'login-chart') {
-            renderLoginChart(@json($labels), @json($data));
+        // Function to update chart when period changes
+        function updateChart(period) {
+            loginChart.data.labels = loginData[period].labels;
+            loginChart.data.datasets[0].data = loginData[period].data;
+            loginChart.update();
         }
-    });
-</script>
+    </script>
+            </div>

@@ -7,27 +7,18 @@
 
         <!-- Login Chart with buttons -->
   
-        <div class="h-auto w-full rounded-xl border border-neutral-200 bg-zinc-50 p-4">
-            <div class="flex gap-2 mb-4 max-w-sm">
-                <flux:select label="Select Period" class="mb-4 w-xs" onchange="updateChart(this.value)">
-                    <flux:select.option value="daily">Daily</flux:select.option>
-                    <flux:select.option value="weekly">Weekly</flux:select.option>
-                    <flux:select.option value="yearly">Yearly</flux:select.option>
-                </flux:select>
-            </div>
+        <div class="grid grid-cols-3 gap-4">
+            <livewire:login-chart/>
+            <livewire:recent-logins />
 
-            <div class="w-full h-80">
-                <canvas id="loginChart"></canvas>
-            </div>
         </div>
-
        
-
+        
         <!-- Background Pattern Placeholder -->
         <livewire:history/>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    {{-- <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <script>
         const loginData = @json($loginData);
@@ -67,5 +58,5 @@
             loginChart.data.datasets[0].data = loginData[period].data;
             loginChart.update();
         }
-    </script>
+    </script> --}}
 </x-layouts.app>

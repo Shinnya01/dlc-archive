@@ -17,6 +17,9 @@ use App\Livewire\Auth\ResetPassword;
 use Illuminate\Support\Facades\Http;
 use App\Livewire\Auth\ForgotPassword;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
+use App\Models\LoginLog;
 
 Route::get('/', function () {
     
@@ -24,6 +27,12 @@ Route::get('/', function () {
     if(auth()->check() && auth()->user()->status === 'verified') {
 
         if(auth()->user()->isUser()){
+
+            LoginLog::create([
+                'user_id' => auth()->user()->id,
+                'logged_in_at' => now(),
+            ]);
+
             return redirect()->route('templates');
         }else{
             return redirect()->route('dashboard');
@@ -48,9 +57,7 @@ Route::get('not-verified', function(){
     }
 })->name('not-verified');
 
-use Illuminate\Support\Facades\DB;
-use Carbon\Carbon;
-use App\Models\LoginLog;
+
 
 Route::get('dashboard', function () {
     $name = auth()->user()->name;
@@ -60,7 +67,7 @@ Route::get('dashboard', function () {
     // ---------- DAILY: last 7 days ----------
     $daily = LoginLog::select(
         DB::raw('DATE(logged_in_at) as date'),
-        DB::raw('COUNT(*) as count')
+        DB::raw('COUNT(DISTINCT user_id) as count')
     )
     ->where('logged_in_at', '>=', $now->copy()->subDays(6))
     ->groupBy('date')
@@ -82,7 +89,9 @@ Route::get('dashboard', function () {
     for ($i = 3; $i >= 0; $i--) {
         $start = $now->copy()->subWeeks($i)->startOfWeek(); // Monday
         $end = $now->copy()->subWeeks($i)->endOfWeek(); // Sunday
-        $count = LoginLog::whereBetween('logged_in_at', [$start, $end])->count();
+        $count = LoginLog::whereBetween('logged_in_at', [$start, $end])
+                        ->distinct('user_id')
+                        ->count('user_id');
 
         $weeklyLabels[] = 'Week of '.$start->format('M d'); // e.g., Week of Oct 06
         $weeklyData[] = $count;
@@ -94,8 +103,9 @@ Route::get('dashboard', function () {
     for ($i = 11; $i >= 0; $i--) {
         $monthStart = $now->copy()->subMonths($i)->startOfMonth();
         $monthEnd = $now->copy()->subMonths($i)->endOfMonth();
-        $count = LoginLog::whereBetween('logged_in_at', [$monthStart, $monthEnd])->count();
-
+        $count = LoginLog::whereBetween('logged_in_at', [$monthStart, $monthEnd])
+                        ->distinct('user_id')
+                        ->count('user_id');
         $yearlyLabels[] = $monthStart->format('M'); // Jan, Feb, etc.
         $yearlyData[] = $count;
     }
