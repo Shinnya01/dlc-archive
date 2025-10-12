@@ -1,4 +1,4 @@
-# Base PHP image
+# Use PHP 8.2 CLI as base
 FROM php:8.2-cli
 
 # Install dependencies
@@ -12,21 +12,21 @@ COPY --from=composer:latest /usr/bin/composer /usr/bin/composer
 # Set working directory
 WORKDIR /var/www/html
 
-# Copy all files
+# Copy project files
 COPY . .
 
-# Install PHP dependencies
-RUN composer install --no-dev --optimize-autoloader
+# Install PHP dependencies without running any artisan commands
+RUN composer install --no-dev --optimize-autoloader --no-scripts
 
-# Install Node.js and build assets (for Livewire, Vite, etc.)
+# Install Node.js and build assets
 RUN curl -fsSL https://deb.nodesource.com/setup_22.x | bash - && apt-get install -y nodejs
 RUN npm install && npm run build
 
-# Set correct permissions
+# Fix permissions
 RUN chown -R www-data:www-data storage bootstrap/cache
 
-# Expose port for Laravel
+# Expose Laravel port
 EXPOSE 8000
 
-# Start Laravel after the container boots
-CMD php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=8000
+# Run everything after the container starts (runtime)
+CMD php artisan config:clear && php artisan migrate --force && php artisan storage:link && php artisan serve --host=0.0.0.0 --port=8000
