@@ -457,5 +457,13 @@ Route::get('/test-pdf', function () {
             $pdf->Output($fullPath, 'F');
 })->name('download-pdf');
 
+// test ui mail
+
+// use Illuminate\Support\Facades\View;
+
+// Route::get('/preview-account-approved', function () {
+//     $userName = 'ml0997130@gmail.com'; // sample name or email
+//     return view('emails.pending-approval', compact('userName'));
+// });
 
 require __DIR__.'/auth.php';
