@@ -77,7 +77,7 @@ class ManageUsers extends Component
         $user->status = 'verified';
 
         $user->save();
-        Mail::to($user->email)->queue(new UserApprovedMail($user->name));
+        Mail::to($user->email)->send(new UserApprovedMail($user->name));
         $this->fetchUser();
         Toaster::success('User Verified Successfully!');
     }

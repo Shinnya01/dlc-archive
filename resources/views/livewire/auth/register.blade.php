@@ -40,9 +40,10 @@ new #[Layout('components.layouts.auth')] class extends Component {
         Auth::login($user);
 
         session()->flash('uid', $validated['uid']);
-
-        $this->redirectIntended(route('home', absolute: false), navigate: true);
+        
         Mail::to($user->email)->send(new PendingApprovalMail($user->name));
+        $this->redirectIntended(route('home', absolute: false), navigate: true);
+        
     }
 }; ?>
 
