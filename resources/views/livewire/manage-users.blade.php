@@ -41,11 +41,16 @@
                                 {{ $user->email }}
                             </td>
                             <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-700">
-                            <div class="flex items-center gap-1 text-green-600"><flux:icon.check-badge class="size-4" /> {{ $user->status }}</div>
+                            <div class="flex items-center gap-1 {{ $user->status === 'pending' ? 'text-yellow-600' : 'text-green-600' }}">
+                                @if($user->status === 'approved')
+                                    <flux:icon.check-badge class="size-4" />
+                                @endif
+                                {{ ucfirst($user->status) }}
+                            </div>
                             </td>
                             <td class="px-6 py-4 flex gap-2 justify-end whitespace-nowrap text-sm">
                             @if($user->status === 'pending')
-                                <flux:button class="mr-2" icon="check" size="sm" class="!bg-green-500 !text-white" wire:click="approveUser({{ $user->id }})">Verify</flux:button>
+                                <flux:button class="mr-2" icon="check" size="sm" class="!bg-green-500 text-yellow-600" wire:click="approveUser({{ $user->id }})">Verify</flux:button>
                             @endif
                             <flux:modal.trigger :name="'edit-user'.$user->id" wire:click="editUser({{ $user->id }})">
                                 <flux:button class="mr-2" icon="pencil-square" size="sm" class=""/>
