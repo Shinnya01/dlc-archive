@@ -52,7 +52,7 @@
   <table cellpadding="0" cellspacing="0" role="presentation">
     <tr>
       <td align="center">
-        <h2>Hello {{ $user }},</h2>
+        <h2>Hello {{ $userName }},</h2>
 
         <p>Your account request has been <strong>approved by the admin</strong>.</p>
 
