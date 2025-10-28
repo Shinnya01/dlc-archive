@@ -9,9 +9,9 @@
         <flux:input icon="magnifying-glass" placeholder="Search Users" class="w-full sm:w-48" />
 
           <div class="flex items-center gap-2">
-            <flux:input placeholder="From" class="w-24 sm:w-32" />
+            <flux:input type="number" min="1900" max="2099" step="1" placeholder="From Year" class="w-24 sm:w-32" />
             <span>-</span>
-            <flux:input placeholder="To" class="w-24 sm:w-32" />
+            <flux:input type="number" min="1900" max="2099" step="1" placeholder="To Year" class="w-24 sm:w-32" />
         </div>
 
         <flux:button icon="magnifying-glass" class="w-full sm:w-auto">
@@ -19,7 +19,6 @@
         </flux:button>
     </div>
     </div>
-
 
     
     <div class="grid lg:grid-cols-3 gap-4">
