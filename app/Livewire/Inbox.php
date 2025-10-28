@@ -208,6 +208,72 @@ class Inbox extends Component
             $filename = 'ACM_' . Str::random(8) . '.pdf';
             $path = "public/{$filename}";
             $fullPath = storage_path("app/{$path}");
+
+            // Add watermark (use image logo if available, otherwise fallback to text)
+            try {
+                $logoPath = public_path('dhvsu.JPG');
+                $useImage = file_exists($logoPath);
+
+                $watermarkText = 'APPROVED - ' . now()->format('Y-m-d');
+                $numPages = method_exists($pdf, 'getNumPages') ? $pdf->getNumPages() : (int)$pdf->getAliasNbPages();
+                if ($numPages <= 0) {
+                    $numPages = 1;
+                }
+
+                for ($p = 1; $p <= $numPages; $p++) {
+                    $pdf->setPage($p);
+
+                    $pageWidth = $pdf->getPageWidth();
+                    $pageHeight = $pdf->getPageHeight();
+
+                    // lightly transparent
+                    if (method_exists($pdf, 'SetAlpha')) {
+                        $pdf->SetAlpha(0.08);
+                    }
+
+                    if ($useImage) {
+                        // Place image centered and rotated
+                        $maxWidth = $pageWidth * 0.7; // 70% of page width
+                        // maintain aspect ratio using getimagesize
+                        [$imgW, $imgH] = @getimagesize($logoPath) ?: [100, 100];
+                        $ratio = $imgH > 0 ? ($imgW / $imgH) : 1;
+                        $drawW = $maxWidth;
+                        $drawH = $drawW / $ratio;
+
+                        $x = ($pageWidth - $drawW) / 2;
+                        $y = ($pageHeight - $drawH) / 2;
+
+                        if (method_exists($pdf, 'StartTransform') && method_exists($pdf, 'Rotate') && method_exists($pdf, 'StopTransform')) {
+                            $pdf->StartTransform();
+                            $pdf->Rotate(45, $pageWidth / 2, $pageHeight / 2);
+                            $pdf->Image($logoPath, $x, $y, $drawW, $drawH, '', '', '', false, 300, '', false, false, 0, false, false, false);
+                            $pdf->StopTransform();
+                        } else {
+                            $pdf->Image($logoPath, $x, $y, $drawW, $drawH, '', '', '', false, 300, '', false, false, 0, false, false, false);
+                        }
+                    } else {
+                        // Text fallback watermark
+                        $pdf->SetFont('helvetica', 'B', 50);
+                        $pdf->SetTextColor(180, 0, 0);
+
+                        if (method_exists($pdf, 'StartTransform') && method_exists($pdf, 'Rotate') && method_exists($pdf, 'StopTransform')) {
+                            $pdf->StartTransform();
+                            $pdf->Rotate(45, $pageWidth / 2, $pageHeight / 2);
+                            $pdf->Text($pageWidth * 0.15, $pageHeight / 2, $watermarkText);
+                            $pdf->StopTransform();
+                        } else {
+                            $pdf->Text($pageWidth * 0.15, $pageHeight / 2, $watermarkText);
+                        }
+                    }
+
+                    if (method_exists($pdf, 'SetAlpha')) {
+                        $pdf->SetAlpha(1);
+                    }
+                }
+            } catch (\Exception $e) {
+                Log::warning('Failed to add watermark: ' . $e->getMessage());
+            }
+
             $pdf->Output($fullPath, 'F');
 
             $request->pdf_path = $path;
